@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS analytics (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_sessions_user_id ON sessions(user_id);
-CREATE INDEX idx_questions_session_id ON questions(session_id);
-CREATE INDEX idx_responses_question_id ON responses(question_id);
-CREATE INDEX idx_evaluations_response_id ON evaluations(response_id);
-CREATE INDEX idx_analytics_session ON analytics(session_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_questions_session_id ON questions(session_id);
+CREATE INDEX IF NOT EXISTS idx_responses_question_id ON responses(question_id);
+CREATE INDEX IF NOT EXISTS idx_evaluations_response_id ON evaluations(response_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_session ON analytics(session_id);
