@@ -428,9 +428,9 @@ if (existsSync(frontendDist)) {
 
 // ─── START SERVER ──────────────────────────────────────────────────────────────
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 3000;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 AI Interview Coach - Server running`);
-  console.log(`   http://localhost:${PORT}`);
+  console.log(`   http://0.0.0.0:${PORT}`);
   console.log(`   Static: ${existsSync(frontendDist) ? 'serving frontend/dist' : 'not built (dev mode)'}\n`);
 });
