@@ -1,0 +1,36 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c": {
+      "displayName": "ProfileManagement/Code",
+      "source": {
+        "path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-us-east-1-1f27457b": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1",
+          "objectKey": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-us-east-1"
+        }
+      }
+    },
+    "34e95cc8f07faae2f9bb1147431ed68820e779d8c177444fa1f1134afcf9edc8": {
+      "displayName": "AiInterviewCoachStack Template",
+      "source": {
+        "path": "AiInterviewCoachStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-us-east-1-da7a808f": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1",
+          "objectKey": "34e95cc8f07faae2f9bb1147431ed68820e779d8c177444fa1f1134afcf9edc8.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,25 @@
+{
+  "name": "ai-interview-coach",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered Interview Learning Support System",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:backend": "tsx backend/src/server.ts",
+    "dev:frontend": "cd frontend && npx vite",
+    "migrate": "tsx backend/src/migrate.ts",
+    "dev": "echo 'Run in two terminals: npm run dev:backend AND npm run dev:frontend'",
+    "build": "cd frontend && npm run build",
+    "start": "tsx backend/src/server.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.4",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

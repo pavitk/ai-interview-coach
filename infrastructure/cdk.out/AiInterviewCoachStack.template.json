@@ -1,0 +1,2739 @@
+{
+ "Description": "AI Interview Coach - Serverless infrastructure with API Gateway, Lambda, WAF, and S3",
+ "Parameters": {
+  "BedrockModelId": {
+   "Type": "String",
+   "Default": "anthropic.claude-3-sonnet-20240229-v1:0",
+   "Description": "Amazon Bedrock model ID for question generation and evaluation"
+  },
+  "DbConnectionString": {
+   "Type": "String",
+   "Description": "PostgreSQL database connection string",
+   "NoEcho": true
+  },
+  "PromptTemplateVersion": {
+   "Type": "String",
+   "Default": "v1.0.0",
+   "Description": "Version identifier for the active prompt templates"
+  },
+  "ClerkJwksUrl": {
+   "Type": "String",
+   "Description": "Clerk JWKS endpoint URL for JWT validation"
+  },
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Resources": {
+  "FrontendBucketEFE2E19C": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "BucketName": {
+     "Fn::Sub": "ai-interview-coach-frontend-${AWS::AccountId}"
+    },
+    "CorsConfiguration": {
+     "CorsRules": [
+      {
+       "AllowedHeaders": [
+        "*"
+       ],
+       "AllowedMethods": [
+        "GET",
+        "HEAD"
+       ],
+       "AllowedOrigins": [
+        "*"
+       ],
+       "MaxAge": 3600
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "WebsiteConfiguration": {
+     "ErrorDocument": "index.html",
+     "IndexDocument": "index.html"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/FrontendBucket/Resource"
+   }
+  },
+  "LambdaExecutionRoleD5C26073": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/LambdaExecutionRole/Resource"
+   }
+  },
+  "LambdaExecutionRoleDefaultPolicy6D69732F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "bedrock:InvokeModel",
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "Roles": [
+     {
+      "Ref": "LambdaExecutionRoleD5C26073"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/LambdaExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "ProfileManagement645090E6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "CRUD operations for user profile data",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-profile-management",
+    "Handler": "handlers/profile.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ProfileManagement/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SessionManagement1B9EAF1E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Create and manage interview sessions",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-session-management",
+    "Handler": "handlers/session.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/SessionManagement/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "QuestionGeneration70B31147": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Generate interview questions via Amazon Bedrock",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-question-generation",
+    "Handler": "handlers/question.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/QuestionGeneration/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ResponseEvaluationFB0FBBE4": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Evaluate interview responses via Amazon Bedrock",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-response-evaluation",
+    "Handler": "handlers/evaluation.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ResponseEvaluation/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SessionHistory785ABEC4": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Retrieve session history and detailed feedback",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-session-history",
+    "Handler": "handlers/history.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/SessionHistory/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ConfidenceQuestionnaireBD46B89E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Store and compute confidence questionnaire results",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-confidence-questionnaire",
+    "Handler": "handlers/confidence.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ConfidenceQuestionnaire/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ProgressAnalytics6C324FE5": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Aggregate scores and compute performance trends",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps"
+     }
+    },
+    "FunctionName": "ai-coach-progress-analytics",
+    "Handler": "handlers/analytics.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ProgressAnalytics/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ClerkJwtAuthorizer35FB738B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "arm64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c.zip"
+    },
+    "Description": "Validates Clerk JWT tokens for API Gateway authorization",
+    "Environment": {
+     "Variables": {
+      "BEDROCK_MODEL_ID": {
+       "Ref": "BedrockModelId"
+      },
+      "DB_CONNECTION_STRING": {
+       "Ref": "DbConnectionString"
+      },
+      "PROMPT_TEMPLATE_VERSION": {
+       "Ref": "PromptTemplateVersion"
+      },
+      "NODE_OPTIONS": "--enable-source-maps",
+      "CLERK_JWKS_URL": {
+       "Ref": "ClerkJwksUrl"
+      }
+     }
+    },
+    "FunctionName": "ai-coach-clerk-jwt-authorizer",
+    "Handler": "handlers/authorizer.handler",
+    "MemorySize": 128,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 10
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ClerkJwtAuthorizer/Resource",
+    "aws:asset:path": "asset.7ef525ddb194fb183a8a0a89c32342e38f9796593dfc9658f22c08c673f3388c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ClerkJwtAuthorizerAiInterviewCoachStackClerkTokenAuthorizer40DCA4B5Permissions15982A70": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ClerkJwtAuthorizer35FB738B",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/authorizers/",
+       {
+        "Ref": "ClerkTokenAuthorizerD1516320"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ClerkJwtAuthorizer/AiInterviewCoachStackClerkTokenAuthorizer40DCA4B5:Permissions"
+   }
+  },
+  "AiInterviewCoachApi8C5DEB32": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "API Gateway for AI Interview Coach backend services",
+    "Name": "AI Interview Coach API"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Resource"
+   }
+  },
+  "AiInterviewCoachApiCloudWatchRoleD444AA9F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/CloudWatchRole/Resource"
+   }
+  },
+  "AiInterviewCoachApiAccountE6435425": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "AiInterviewCoachApiCloudWatchRoleD444AA9F",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "AiInterviewCoachApi8C5DEB32"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Account"
+   }
+  },
+  "AiInterviewCoachApiDeployment376D1E3Cd0d9795bfa4b8d08a562be5676e6c921": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "API Gateway for AI Interview Coach backend services",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "DependsOn": [
+    "AiInterviewCoachApiapianalyticsOPTIONS0F85FE3B",
+    "AiInterviewCoachApiapianalyticsprogressGET57B3B13E",
+    "AiInterviewCoachApiapianalyticsprogressOPTIONS02A3DD04",
+    "AiInterviewCoachApiapianalyticsprogress1E6B93A7",
+    "AiInterviewCoachApiapianalytics2F6B165E",
+    "AiInterviewCoachApiapiOPTIONS2E65EC15",
+    "AiInterviewCoachApiapiprofileGET9FEE11D4",
+    "AiInterviewCoachApiapiprofileOPTIONSFDE3A241",
+    "AiInterviewCoachApiapiprofilePOST2AD3AF9B",
+    "AiInterviewCoachApiapiprofilePUT6D5A08DA",
+    "AiInterviewCoachApiapiprofile5620FA95",
+    "AiInterviewCoachApiapi5B40A3D5",
+    "AiInterviewCoachApiapisessionssessionIdconfidenceOPTIONS34E3EE5C",
+    "AiInterviewCoachApiapisessionssessionIdconfidencePOST47D12AEF",
+    "AiInterviewCoachApiapisessionssessionIdconfidenceCC085262",
+    "AiInterviewCoachApiapisessionssessionIdevaluateOPTIONS59A90160",
+    "AiInterviewCoachApiapisessionssessionIdevaluatePOST219A6784",
+    "AiInterviewCoachApiapisessionssessionIdevaluate195EDE0E",
+    "AiInterviewCoachApiapisessionssessionIdGETE245A6DF",
+    "AiInterviewCoachApiapisessionssessionIdOPTIONS818EFE23",
+    "AiInterviewCoachApiapisessionssessionIdquestionsOPTIONS6224EDD4",
+    "AiInterviewCoachApiapisessionssessionIdquestionsPOST4DBC59BF",
+    "AiInterviewCoachApiapisessionssessionIdquestions393E9E02",
+    "AiInterviewCoachApiapisessionssessionId1C0B01A0",
+    "AiInterviewCoachApiapisessionsGET9FF5A27A",
+    "AiInterviewCoachApiapisessionsOPTIONS848CCBC2",
+    "AiInterviewCoachApiapisessionsPOST3B5B1D53",
+    "AiInterviewCoachApiapisessions83FF3D05",
+    "AiInterviewCoachApiOPTIONSCD43E940"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "AiInterviewCoachApiDeploymentStageprodB107E49B": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "AiInterviewCoachApiDeployment376D1E3Cd0d9795bfa4b8d08a562be5676e6c921"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": false,
+      "HttpMethod": "*",
+      "ResourcePath": "/*",
+      "ThrottlingBurstLimit": 200,
+      "ThrottlingRateLimit": 100
+     }
+    ],
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    },
+    "StageName": "prod"
+   },
+   "DependsOn": [
+    "AiInterviewCoachApiAccountE6435425"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "AiInterviewCoachApiOPTIONSCD43E940": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "AiInterviewCoachApi8C5DEB32",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapi5B40A3D5": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "AiInterviewCoachApi8C5DEB32",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "api",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/Resource"
+   }
+  },
+  "AiInterviewCoachApiapiOPTIONS2E65EC15": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapi5B40A3D5"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapiprofile5620FA95": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapi5B40A3D5"
+    },
+    "PathPart": "profile",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/Resource"
+   }
+  },
+  "AiInterviewCoachApiapiprofileOPTIONSFDE3A241": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapiprofile5620FA95"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapiprofilePOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapiprofile71F88413": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProfileManagement645090E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/POST/api/profile"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.profile"
+   }
+  },
+  "AiInterviewCoachApiapiprofilePOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapiprofile577281F1": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProfileManagement645090E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/POST/api/profile"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.profile"
+   }
+  },
+  "AiInterviewCoachApiapiprofilePOST2AD3AF9B": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ProfileManagement645090E6",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapiprofile5620FA95"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/POST/Resource"
+   }
+  },
+  "AiInterviewCoachApiapiprofileGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapiprofileF8DF9986": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProfileManagement645090E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/GET/api/profile"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.profile"
+   }
+  },
+  "AiInterviewCoachApiapiprofileGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapiprofileA154A37F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProfileManagement645090E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/GET/api/profile"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.profile"
+   }
+  },
+  "AiInterviewCoachApiapiprofileGET9FEE11D4": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ProfileManagement645090E6",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapiprofile5620FA95"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/GET/Resource"
+   }
+  },
+  "AiInterviewCoachApiapiprofilePUTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508PUTapiprofileF4901485": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProfileManagement645090E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/PUT/api/profile"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/PUT/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.PUT..api.profile"
+   }
+  },
+  "AiInterviewCoachApiapiprofilePUTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508PUTapiprofile7CB9C9C0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProfileManagement645090E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/PUT/api/profile"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/PUT/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.PUT..api.profile"
+   }
+  },
+  "AiInterviewCoachApiapiprofilePUT6D5A08DA": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "PUT",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ProfileManagement645090E6",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapiprofile5620FA95"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/PUT/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessions83FF3D05": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapi5B40A3D5"
+    },
+    "PathPart": "sessions",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionsOPTIONS848CCBC2": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessions83FF3D05"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionsPOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionsE0B81E24": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SessionManagement1B9EAF1E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/POST/api/sessions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions"
+   }
+  },
+  "AiInterviewCoachApiapisessionsPOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessions7607453B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SessionManagement1B9EAF1E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/POST/api/sessions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions"
+   }
+  },
+  "AiInterviewCoachApiapisessionsPOST3B5B1D53": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SessionManagement1B9EAF1E",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessions83FF3D05"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/POST/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionsGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessions1DBBBE11": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SessionHistory785ABEC4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/GET/api/sessions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions"
+   }
+  },
+  "AiInterviewCoachApiapisessionsGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessions794B458B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SessionHistory785ABEC4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/GET/api/sessions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions"
+   }
+  },
+  "AiInterviewCoachApiapisessionsGET9FF5A27A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SessionHistory785ABEC4",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessions83FF3D05"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/GET/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionId1C0B01A0": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapisessions83FF3D05"
+    },
+    "PathPart": "{sessionId}",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdOPTIONS818EFE23": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionId1C0B01A0"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessionssessionId494639DA": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SessionManagement1B9EAF1E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/GET/api/sessions/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions.{sessionId}"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessionssessionId3CD6E4D8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SessionManagement1B9EAF1E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/GET/api/sessions/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions.{sessionId}"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdGETE245A6DF": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SessionManagement1B9EAF1E",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionId1C0B01A0"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/GET/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdquestions393E9E02": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionId1C0B01A0"
+    },
+    "PathPart": "questions",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdquestionsOPTIONS6224EDD4": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionIdquestions393E9E02"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdquestionsPOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdquestionsB9D6F50A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QuestionGeneration70B31147",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/POST/api/sessions/*/questions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.questions"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdquestionsPOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdquestions4DF1EB75": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "QuestionGeneration70B31147",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/POST/api/sessions/*/questions"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.questions"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdquestionsPOST4DBC59BF": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "QuestionGeneration70B31147",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionIdquestions393E9E02"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/POST/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdevaluate195EDE0E": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionId1C0B01A0"
+    },
+    "PathPart": "evaluate",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdevaluateOPTIONS59A90160": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionIdevaluate195EDE0E"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdevaluatePOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdevaluate0BE67796": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ResponseEvaluationFB0FBBE4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/POST/api/sessions/*/evaluate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.evaluate"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdevaluatePOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdevaluate8E06AC56": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ResponseEvaluationFB0FBBE4",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/POST/api/sessions/*/evaluate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.evaluate"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdevaluatePOST219A6784": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ResponseEvaluationFB0FBBE4",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionIdevaluate195EDE0E"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/POST/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdconfidenceCC085262": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionId1C0B01A0"
+    },
+    "PathPart": "confidence",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdconfidenceOPTIONS34E3EE5C": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionIdconfidenceCC085262"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdconfidencePOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdconfidence58E4DF2B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ConfidenceQuestionnaireBD46B89E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/POST/api/sessions/*/confidence"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.confidence"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdconfidencePOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdconfidence38703DD1": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ConfidenceQuestionnaireBD46B89E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/POST/api/sessions/*/confidence"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.confidence"
+   }
+  },
+  "AiInterviewCoachApiapisessionssessionIdconfidencePOST47D12AEF": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ConfidenceQuestionnaireBD46B89E",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapisessionssessionIdconfidenceCC085262"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/POST/Resource"
+   }
+  },
+  "AiInterviewCoachApiapianalytics2F6B165E": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapi5B40A3D5"
+    },
+    "PathPart": "analytics",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/Resource"
+   }
+  },
+  "AiInterviewCoachApiapianalyticsOPTIONS0F85FE3B": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapianalytics2F6B165E"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapianalyticsprogress1E6B93A7": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "AiInterviewCoachApiapianalytics2F6B165E"
+    },
+    "PathPart": "progress",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/Resource"
+   }
+  },
+  "AiInterviewCoachApiapianalyticsprogressOPTIONS02A3DD04": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapianalyticsprogress1E6B93A7"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/OPTIONS/Resource"
+   }
+  },
+  "AiInterviewCoachApiapianalyticsprogressGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapianalyticsprogressD3C9F72A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProgressAnalytics6C324FE5",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       },
+       "/GET/api/analytics/progress"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.analytics.progress"
+   }
+  },
+  "AiInterviewCoachApiapianalyticsprogressGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapianalyticsprogress17EEE7CF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ProgressAnalytics6C324FE5",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/test-invoke-stage/GET/api/analytics/progress"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.analytics.progress"
+   }
+  },
+  "AiInterviewCoachApiapianalyticsprogressGET57B3B13E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "CUSTOM",
+    "AuthorizerId": {
+     "Ref": "ClerkTokenAuthorizerD1516320"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ProgressAnalytics6C324FE5",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "AiInterviewCoachApiapianalyticsprogress1E6B93A7"
+    },
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/GET/Resource"
+   }
+  },
+  "ClerkTokenAuthorizerD1516320": {
+   "Type": "AWS::ApiGateway::Authorizer",
+   "Properties": {
+    "AuthorizerResultTtlInSeconds": 300,
+    "AuthorizerUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           ":",
+           {
+            "Fn::GetAtt": [
+             "ClerkJwtAuthorizer35FB738B",
+             "Arn"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       ":apigateway:",
+       {
+        "Fn::Select": [
+         3,
+         {
+          "Fn::Split": [
+           ":",
+           {
+            "Fn::GetAtt": [
+             "ClerkJwtAuthorizer35FB738B",
+             "Arn"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "ClerkJwtAuthorizer35FB738B",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    },
+    "IdentitySource": "method.request.header.Authorization",
+    "Name": "AiInterviewCoachStackClerkTokenAuthorizer40DCA4B5",
+    "RestApiId": {
+     "Ref": "AiInterviewCoachApi8C5DEB32"
+    },
+    "Type": "TOKEN"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ClerkTokenAuthorizer/Resource"
+   }
+  },
+  "ApiWafWebAcl": {
+   "Type": "AWS::WAFv2::WebACL",
+   "Properties": {
+    "DefaultAction": {
+     "Allow": {}
+    },
+    "Name": "AiInterviewCoachWebAcl",
+    "Rules": [
+     {
+      "Name": "AWSManagedRulesSQLiRuleSet",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 1,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesSQLiRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "SQLiRuleSet",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Name": "AWSManagedRulesCommonRuleSet",
+      "OverrideAction": {
+       "None": {}
+      },
+      "Priority": 2,
+      "Statement": {
+       "ManagedRuleGroupStatement": {
+        "Name": "AWSManagedRulesCommonRuleSet",
+        "VendorName": "AWS"
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "CommonRuleSet",
+       "SampledRequestsEnabled": true
+      }
+     },
+     {
+      "Action": {
+       "Block": {}
+      },
+      "Name": "RateLimitRule",
+      "Priority": 3,
+      "Statement": {
+       "RateBasedStatement": {
+        "AggregateKeyType": "IP",
+        "Limit": 100
+       }
+      },
+      "VisibilityConfig": {
+       "CloudWatchMetricsEnabled": true,
+       "MetricName": "RateLimitRule",
+       "SampledRequestsEnabled": true
+      }
+     }
+    ],
+    "Scope": "REGIONAL",
+    "VisibilityConfig": {
+     "CloudWatchMetricsEnabled": true,
+     "MetricName": "AiInterviewCoachWaf",
+     "SampledRequestsEnabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/ApiWafWebAcl"
+   }
+  },
+  "WafApiGatewayAssociation": {
+   "Type": "AWS::WAFv2::WebACLAssociation",
+   "Properties": {
+    "ResourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":apigateway:us-east-1::/restapis/",
+       {
+        "Ref": "AiInterviewCoachApi8C5DEB32"
+       },
+       "/stages/",
+       {
+        "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+       }
+      ]
+     ]
+    },
+    "WebACLArn": {
+     "Fn::GetAtt": [
+      "ApiWafWebAcl",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "ApiWafWebAcl"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/WafApiGatewayAssociation"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02PQW/CMAyFfwv3kLEytHMB7bRpqEzaEZnUgGmbVHFCxaL89ykpY5zeZz3L77mQxeJVziYw8FTVzbSlvQxbB6oRq4PegIUOHVoBA+8Cz2VYetWgS+aNRlkCYxQEnQyVaTH5WTemJXXNtzJF0UK3r0GGN6+VI6OT98gbtB0xk9FR8HwHzOhYlkkE9HQEhwNcZaiQXdlTTvrHUinjtRNr7Ftz7VDnqg/T1sEx1xuhQjbeKkz9xQe6k6mTeaM/9xYy8pdpUJfenYylH7Q59T5FMcDhUsiwOuhv3Jerd3GnktkogvRojCJ/lEqQPqadT+9676LQpkZ55qdL8SKfF3I2OTPR1HrtqENZjfoLR+Iul7cBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "AiInterviewCoachStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "AiInterviewCoachApiEndpointA9C9913A": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "AiInterviewCoachApi8C5DEB32"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ApiGatewayUrl": {
+   "Description": "API Gateway endpoint URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "AiInterviewCoachApi8C5DEB32"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "FrontendBucketName": {
+   "Description": "S3 bucket name for frontend static hosting",
+   "Value": {
+    "Ref": "FrontendBucketEFE2E19C"
+   }
+  },
+  "WebAclArn": {
+   "Description": "WAF WebACL ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "ApiWafWebAcl",
+     "Arn"
+    ]
+   }
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

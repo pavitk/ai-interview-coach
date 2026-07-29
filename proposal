@@ -1,0 +1,718 @@
+Development and Evaluation of an AI-Based Interview Learning Support System
+Abstract
+Preparing for technical job interviews requires not only domain knowledge but also the
+ability to communicate answers clearly, structure responses effectively, and explain
+problem-solving approaches. Although recent AI-based interview coaching systems and
+large language models can generate interview questions and feedback, most focus on
+conversation and question generation rather than measuring learning outcomes. As a
+result, it remains unclear whether AI-generated feedback actually helps students improve
+their interview responses.
+This research proposes the development of a lightweight AI-based interview coaching
+prototype that provides structured rubric-based feedback and radar-chart visualization.
+The primary objective is to investigate whether structured AI-generated feedback helps
+students improve the quality of their interview responses and better understand how to
+revise their answers. The system evaluates responses using predefined criteria including
+relevance, structure, clarity, technical accuracy, and communication.
+The study adopts a design-and-evaluation methodology in which participants answer
+interview questions, receive structured feedback, revise their responses, and submit
+improved answers. Learning improvement is measured through changes in rubric scores
+between initial and revised responses, while confidence questionnaires are used as a
+secondary measure. The research contributes to AI-assisted educational technology by
+providing a reproducible and interpretable framework for evaluating learning during
+interview preparation.
+II
+Table of Contents
+Abstract ............................................................................................................. II
+List of Figures ................................................................................................... IV
+List of Tables .................................................................................................... IV
+1. Introduction .................................................................................................... 1
+2. Literature Review ........................................................................................... 2
+LLM-Based Interview Systems ................................................................................................................ 2
+Full-Stack AI Interview Platforms ........................................................................................................... 2
+Multimodal Interview Analysis Systems ................................................................................................. 3
+Adaptive and Conversational AI Systems ............................................................................................... 3
+Evaluation rubrics .................................................................................................................................... 3
+3. Identified Research Gap .................................................................................. 4
+4. Novelty and Research Contribution ................................................................ 5
+5. Research Questions and Alignment ................................................................. 6
+6. System Architecture ........................................................................................ 6
+7. System Design ................................................................................................. 6
+Radar Chart Generation .......................................................................................................................... 7
+8. Methodology ................................................................................................... 8
+Research Design ...................................................................................................................................... 8
+Participants and Experimental Design ................................................................................................... 8
+Prompt Engineering Strategy .................................................................................................................. 9
+System Workflow ..................................................................................................................................... 9
+Evaluation Methodology .......................................................................................................................... 9
+Reproducibility and Experimental Control ........................................................................................... 13
+Data Analysis ......................................................................................................................................... 13
+Ethical Considerations ........................................................................................................................... 14
+Scope and Limitations ........................................................................................................................... 14
+Research Process Flow ........................................................................................................................... 15
+9. Evaluation Criteria ........................................................................................ 15
+10. Expected Contribution ................................................................................. 15
+11. Project Schedule ........................................................................................... 16
+12. Declaration ................................................................................................... 16
+13. Conclusion ................................................................................................... 17
+14. References .................................................................................................... 17
+III
+List of Figures
+Figure1: Project Schedule .................................................................................. 16
+List of Tables
+Table 1: Summary of Identified Research Gap .................................................... 4
+Table 2: Tech stack used in the application ......................................................... 7
+Table 3: Evaluation dimensions - rubric definition ........................................... 10
+IV
+1. Introduction
+Interview preparation is a critical component of student career development, particularly
+for those pursuing technical roles in the software industry. Technical interviews require
+not only knowledge of concepts but also the ability to clearly explain problem-solving
+approaches, structure responses, and communicate effectively under time constraints.
+Success in these interviews depends on both technical competence and communication
+skills, making interview preparation an essential aspect of employability.
+General-purpose LLMs such as ChatGPT can generate interview questions and provide
+feedback when users supply an appropriate prompt, job description, and interview
+context. However, these systems are primarily designed for conversational interaction
+rather than educational evaluation. Feedback varies depending on prompt wording,
+conversation history, and user interaction, making it difficult to provide standardized
+assessment or measure learning across different users and sessions. Furthermore,
+ChatGPT does not inherently provide structured rubric-based scoring, radar-chart
+visualization, or mechanisms for evaluating learning improvement through response
+revision. Therefore, the contribution of this research is not the development of another
+interview chatbot, but the design and evaluation of a structured learning support
+prototype that enables consistent feedback and measurable learning outcomes.
+Recent advances in artificial intelligence, particularly large language models (LLMs), have
+enabled the development of systems capable of generating realistic interview questions
+and evaluating user responses. However, existing research largely focuses on the
+functionality of these systems, such as question generation, conversational interaction,
+and personalization, rather than investigating how AI-generated feedback supports
+learning. Consequently, there is limited evidence regarding whether structured AI
+feedback helps students improve the quality of their interview responses or better
+understand effective communication strategies.
+To address this gap, this research investigates the use of structured AI-generated feedback
+as a learning support mechanism for technical interview preparation. A lightweight
+prototype system is developed to provide rubric-based evaluation across multiple
+dimensions, including relevance, structure, clarity, technical accuracy, and
+communication. The feedback is presented through numerical scores, written
+recommendations, and radar-chart visualization to improve interpretability and support
+reflection.
+The primary objective of this study is not to evaluate the technical capabilities of the AI
+system itself, but to investigate whether structured AI-generated feedback supports
+learning during technical interview preparation. Specifically, the research examines
+whether students can improve the quality of their interview responses after receiving
+structured feedback and revising their answers. Learning improvement is measured
+through changes between initial and revised responses using predefined rubric
+dimensions, including relevance, structure, clarity, technical accuracy, and
+1
+communication. Participant perceptions of feedback usefulness and confidence are also
+collected; however, these are treated as secondary outcomes that complement the
+primary learning measures. By focusing on measurable learning improvement rather
+than system complexity, this research aims to contribute to the design of more effective
+AI-supported educational tools for interview preparation.
+2. Literature Review
+Recent advancements in Artificial Intelligence, particularly Large Language Models
+(LLMs), have significantly transformed interview preparation systems by enabling
+dynamic question generation, personalized feedback, and real-time interaction. Existing
+research demonstrates the potential of AI-driven interview coaching systems to simulate
+realistic interview environments and provide individualized support. This section reviews
+existing work in AI-driven interview coaching, focusing on LLM-based systems,
+multimodal frameworks, and adaptive feedback mechanisms while identifying
+limitations that motivate the present study.
+LLM-Based Interview Systems
+Recent studies have demonstrated that large language models (LLMs) can generate
+realistic interview questions and provide personalized feedback. Behzadan et al. (2025)
+showed that LLM-generated feedback can support interview preparation and is perceived
+positively by users, while Deshpande and Chaudhari (2026) highlighted the use of prompt
+engineering to improve personalization and response quality. Similarly, Rupareliya and
+Bangoria (2026) demonstrated that AI-based career coaching systems can increase user
+engagement through adaptive conversational interactions.
+However, these studies primarily evaluate the capability of LLMs to generate questions
+and feedback rather than investigating whether the feedback leads to measurable learning
+improvement. Feedback is typically presented as conversational text without
+standardized rubrics or consistent evaluation criteria, making it difficult to compare
+learner performance over time or determine whether students actually improve after
+receiving AI-generated feedback.
+Full-Stack AI Interview Platforms
+Kulkarni et al. (2025) proposed a full-stack AI interview coaching platform integrating
+generative AI with a modern web application. The system provides role-specific interview
+questions, résumé support, and AI-generated feedback, demonstrating the practical
+feasibility of AI-assisted interview preparation.
+Despite its practical implementation, the study places greater emphasis on application
+functionality than on educational evaluation. Improvements are primarily reported
+through user experience and confidence rather than objective evidence of learning, and
+the evaluation process lacks a structured rubric for measuring changes in response quality
+after feedback.
+2
+Multimodal Interview Analysis Systems
+Vinodhini et al. (2025) and Yamini et al. (2024) extended interview coaching by
+incorporating multimodal analysis, including speech, facial expressions, and emotion
+recognition. These approaches provide richer assessment of interview behaviour and
+more realistic interview simulations.
+Although multimodal systems offer comprehensive analysis, they introduce additional
+computational complexity while providing limited evidence that the extra modalities
+improve learning outcomes. Furthermore, the evaluation criteria are often difficult for
+learners to interpret, reducing the educational usefulness of the generated feedback.
+Adaptive and Conversational AI Systems
+Deshmukh et al. (2026), Madanachitran et al. (2025), and the NexInterview platform
+employ conversational AI to generate adaptive interview questions and personalized
+follow-up interactions. These systems improve realism and user engagement by adjusting
+interview difficulty according to user responses.
+However, adaptive questioning alone does not demonstrate whether learners improve
+their interview skills. Most studies emphasize conversational realism and interaction
+quality, while providing limited evidence regarding structured assessment, response
+revision, or measurable learning gains resulting from AI-generated feedback.
+Evaluation rubrics
+Educational assessment research has consistently demonstrated that analytic rubrics
+improve the consistency, transparency, and interpretability of performance evaluation.
+Widely used frameworks such as the AAC&U VALUE Rubrics and oral communication
+assessment rubrics evaluate learners across multiple predefined criteria, enabling more
+reliable assessment and clearer identification of strengths and areas for improvement.
+These principles motivate the structured rubric-based evaluation framework adopted in
+this study.
+The literature demonstrates that AI has become increasingly effective at generating
+interview questions, simulating conversations, and providing personalized feedback.
+However, comparatively little research investigates AI as a learning support tool by
+measuring whether structured feedback enables students to improve the quality of their
+interview responses after revision. In addition, existing studies rarely combine
+standardized rubric-based evaluation, interpretable visualization, and learning
+measurement within a single educational framework. These limitations motivate the
+present study, which focuses on evaluating learning improvement rather than developing
+another interview coaching application.
+3
+3. Identified Research Gap
+Table 1: Summary of Identified Research Gap
+Category Key Studies Approach Used Strengths LLM-Based
+Interview
+Systems
+Behzadan et al.
+(2025);
+Deshpande &
+Chaudhari
+(2026);
+Rupareliya &
+Bangoria (2026)
+LLMs, prompt
+engineering,
+AI-generated
+feedback
+Realistic
+questions,
+personalized
+feedback
+AI Interview
+Coaching
+Platforms
+Kulkarni et al.
+(2025)
+Generative AI
+integrated with
+web-based
+interview
+coaching
+Practical
+deployment
+and user
+support
+Multimodal
+Interview
+Systems
+Vinodhini et al.
+(2025); Yamini
+et al. (2024)
+Text, audio,
+video, and
+emotion
+analysis
+Rich
+behavioral
+assessment
+Adaptive
+Conversational
+AI Systems
+Deshmukh et al.
+(2026);
+Madanachitran
+et al. (2025);
+NexInterview
+(2025)
+Adaptive
+questioning
+and
+conversational
+interaction
+Realistic
+interview
+simulation
+and
+engagement
+Educational
+Assessment
+and Rubric-
+Based
+Evaluation
+Oral
+communication
+rubrics,
+formative
+assessment
+literature
+Analytic
+rubrics and
+structured
+feedback
+Transparent
+scoring and
+interpretable
+evaluation
+Research Gap
+Related to
+Learning
+Limited
+evidence that
+feedback
+improves
+response
+quality; lack of
+reproducible
+learning
+assessment
+Learning
+improvement is
+not directly
+measured;
+feedback
+effectiveness
+remains
+unclear
+Focus on
+multimodal
+analysis rather
+than
+understanding
+how feedback
+supports
+learning
+Limited
+structured
+evaluation of
+learning gains
+and response
+improvement
+Limited
+application of
+rubric-based
+learning
+assessment in
+AI interview
+coaching
+systems
+4
+Existing AI interview preparation systems primarily focus on question generation,
+conversational realism, personalization, and interview simulation. While these systems
+successfully automate interview practice, relatively few studies have investigated whether
+structured AI-generated feedback leads to measurable improvements in the quality of
+interview responses. Most existing research evaluates the ability of AI systems to generate
+questions and provide feedback rather than examining whether learners can use that
+feedback to improve their answers.
+Another limitation is that feedback is often presented in free-text form without clearly
+defined evaluation criteria. As a result, learners may find it difficult to identify specific
+strengths and weaknesses or understand how their responses improve over time. In
+addition, few studies provide interpretable feedback mechanisms that allow users to
+compare performance across multiple evaluation dimensions or across repeated
+interview attempts.
+Therefore, there is a need to investigate whether structured AI-generated feedback can
+support learning during interview preparation. In particular, few studies have measured
+learning improvement by comparing initial and revised interview responses using
+standardized evaluation criteria. This study addresses that gap by examining how
+structured rubric-based feedback influences response quality, learner understanding, and
+revision performance during technical interview preparation.
+.
+4. Novelty and Research Contribution
+The novelty of this research is not the use of AI itself, but the use of structured AI-
+generated feedback as a learning intervention for interview preparation. Although
+general-purpose LLMs can provide interview coaching, they are not specifically designed
+to support standardized evaluation, learning measurement, or progress tracking.
+This study investigates whether structured AI-generated feedback helps learners improve
+the quality of their interview responses through revision and reflection. The proposed
+approach combines:
+• Structured rubric-based evaluation using predefined assessment criteria
+• Radar-chart visualization for interpretable multi-dimensional feedback
+• Response revision analysis to measure learning improvement between initial and
+revised answers
+• Confidence measurement through pre–post questionnaires as a secondary
+outcome
+• Controlled prompting procedures to improve consistency and reproducibility
+This research evaluates whether structured rubric-based AI feedback improves interview
+learning by comparing students' initial and revised responses. The study contributes
+empirical evidence regarding the educational value of structured AI feedback and
+investigates how visualization techniques such as radar charts influence learners'
+understanding of their performance.
+5
+5. Research Questions and Alignment
+To address the identified research gap, this study investigates whether structured AI-
+generated feedback can support learning during technical interview preparation. The
+research focuses on measuring improvements in interview-response quality and
+understanding how learners use feedback to revise their answers.
+Research Questions
+RQ1: Does structured AI-generated feedback improve the quality of students’ interview
+responses after revision?
+RQ2: Which response dimensions improve the most after feedback, including relevance,
+structure, clarity, technical accuracy, and communication?
+RQ3: How do students perceive the usefulness of structured AI feedback for
+understanding and improving their interview responses?
+Hypothesis:
+H1: Students will achieve significantly higher rubric scores after revising responses using
+structured AI-generated feedback.
+H2: Radar-chart visualization will improve students' understanding of their strengths and
+weaknesses compared with text-only feedback.
+H3: Participants will report increased confidence after completing structured AI-assisted
+interview practice.
+6. System Architecture
+The proposed system is implemented as a lightweight web-based prototype consisting of
+four main components: a user interface, an application server, an AI processing module,
+and a database. The user interface allows participants to answer interview questions,
+receive structured feedback, and view radar-chart visualizations. The application server
+communicates with the AI model through the Groq API, applies a predefined evaluation
+prompt and rubric, and returns structured scores and feedback. Interview responses,
+evaluation results, and questionnaire data are stored in a PostgreSQL database for
+subsequent analysis. The architecture is intentionally simple because the primary
+objective of this research is to evaluate the educational effectiveness of structured AI-
+generated feedback rather than develop a production-ready interview coaching platform.
+7. System Design
+The proposed AI Interview Coach system is designed to provide an interactive and
+intelligent interview preparation environment through AI-powered response evaluation.
+The system combines frontend interaction, authentication, AI integration, backend
+6
+processing, and database management to deliver personalized interview coaching. Rather
+than functioning solely as a conversational chatbot, the system emphasizes educational
+effectiveness by providing interpretable and measurable feedback that supports long-
+term learning.
+During each interview session, participants are presented with a technical interview
+question and submit an initial text-based response through the web interface. The
+response is sent to an AI model via the Groq API together with a predefined evaluation
+prompt and rubric. The AI evaluates the response across five dimensions: relevance,
+structure, clarity, technical accuracy, and communication. Each dimension is assigned a
+score on a five-point scale, accompanied by written feedback explaining areas for
+improvement.
+The evaluation results are presented to participants as numerical scores, written feedback,
+and a radar-chart visualization. Using this feedback, participants revise their original
+response and submit an improved version. The revised response is then evaluated using
+the same rubric, enabling comparison between the initial and revised scores. The
+improvement in scores represents the primary measure of learning gain in this study.
+In addition to response evaluation, participants complete brief pre- and post-session
+confidence questionnaires. Confidence is treated as a secondary outcome, while
+improvement in interview-response quality remains the primary focus of the research.
+The collected responses, scores, and questionnaire results are stored in a PostgreSQL
+database for subsequent analysis.
+The prototype is intentionally limited to the functionality required for the educational
+experiment. Features such as user authentication, voice input, long-term progress
+tracking, and multi-session history are outside the scope of the current study.
+Tech Stack
+Table 2: Tech stack used in the application
+Component Technology
+Frontend Framework React
+Styling Tailwind CSS
+Database PostgreSQL
+Backend API Node.js/Express
+Visualization Charts.js
+AI Integration Groq API
+Radar Chart Generation
+After each response is evaluated, the scores obtained across the five evaluation
+dimensions are displayed using a radar chart. The visualization provides an intuitive
+representation of participant performance, helping users identify strengths and areas for
+7
+improvement. Radar charts are also used to compare the initial and revised responses,
+enabling both participants and the researcher to observe learning improvement across
+the evaluation dimensions.
+8. Methodology
+Research Design
+This research adopts a design-and-evaluation methodology to investigate whether
+structured AI-generated feedback can support learning during technical interview
+preparation. A lightweight AI-based interview coaching prototype will be developed to
+provide interview questions, rubric-based feedback, and performance visualization. The
+primary focus of the study is not the technical implementation of the system itself, but the
+evaluation of how learners use and benefit from structured feedback.
+The study is conducted in two phases. The first phase involves the development of a
+prototype interview coaching system using prompt engineering and predefined
+evaluation rubrics. The second phase focuses on empirical evaluation, where participants
+complete interview tasks, receive structured AI-generated feedback, revise their
+responses, and submit improved answers. Changes between initial and revised responses
+are used to measure learning improvement.
+This approach enables the research to examine whether structured feedback helps
+students improve response quality, understand their strengths and weaknesses, and
+develop more effective interview communication skills. By focusing on measurable
+learning outcomes rather than system functionality alone, the study contributes to the
+understanding of how AI-generated feedback can be used as a learning support tool in
+interview preparation.
+Participants and Experimental Design
+Twenty university students will participate in the study. Each participant will complete
+one interview session consisting of five technical interview questions. For each question,
+participants will first submit an initial response. The system will then generate structured
+AI feedback together with rubric-based scores and radar-chart visualization. Participants
+will review the feedback and revise their responses accordingly. The revised responses
+will then be re-evaluated using the same rubric.
+This process allows the study to measure learning improvement by comparing initial and
+revised responses. At the beginning and end of the session, participants will complete a
+confidence questionnaire. After completing the interview session, participants will also
+provide short written reflections describing what they learned from the feedback and how
+they revised their answers.
+8
+Prompt Engineering Strategy
+The system uses a fixed prompt framework to ensure consistency across interview
+sessions and participants. Each prompt includes standardized interviewer instructions,
+interview context, and predefined evaluation criteria. Responses are assessed using a
+rubric covering relevance, structure, clarity, technical accuracy, and communication. To
+improve reproducibility, the same AI model, prompt template, evaluation rubric, and
+model settings (e.g., temperature) are used throughout the study. The model returns
+structured outputs consisting of numerical scores and explanatory feedback, which are
+subsequently used for radar-chart visualization and learning analysis.
+System Workflow
+The system operates through a learning-oriented workflow designed to evaluate the
+effectiveness of structured AI-generated feedback. Participants are presented with
+interview questions and first submit an initial response. The response is then evaluated
+by the AI using a predefined rubric covering relevance, structure, clarity, technical
+accuracy, and communication.
+Based on this evaluation, the system provides structured feedback consisting of numerical
+scores, written recommendations, and radar-chart visualization. Participants review the
+feedback and revise their original response accordingly. The revised response is then re-
+evaluated using the same rubric and evaluation procedure.
+Learning improvement is measured by comparing rubric scores between the initial and
+revised responses. Changes across individual evaluation dimensions are analyzed to
+identify areas of improvement. In addition, participants complete a questionnaire
+regarding the usefulness of the feedback and their confidence in interview preparation.
+This workflow enables the study to examine whether structured AI-generated feedback
+helps learners understand weaknesses, revise responses, and improve interview
+performance.
+Evaluation Methodology
+The proposed system evaluates learning improvement using a structured AI-assisted
+assessment framework. Participant responses are evaluated using a fixed prompt
+template, predefined scoring rubric, and controlled model settings to improve
+consistency across evaluations. Responses are assessed across five dimensions: relevance,
+structure, clarity, technical accuracy, and communication. Each dimension is scored on a
+five-point scale, where higher scores indicate better performance.
+For each interview question, participants first submit an initial response and then receive
+structured AI-generated feedback consisting of numerical scores, written
+recommendations, and radar-chart visualization. Participants subsequently revise their
+responses based on the feedback and submit an improved version. The revised response
+is evaluated using the same rubric and scoring procedure.
+9
+Learning improvement is measured by comparing scores between the initial and revised
+responses across all evaluation dimensions. Radar charts are used to visualize
+performance profiles and highlight areas of improvement. In addition, participants
+complete pre–post questionnaires to evaluate their perceptions of feedback usefulness
+and changes in interview confidence. Confidence is treated as a secondary outcome, while
+the primary outcome of the study is improvement in interview-response quality following
+structured feedback.
+To improve reproducibility, all participants receive the same interview questions,
+evaluation rubric, scoring instructions, and model configuration. The use of controlled
+prompts and structured outputs reduces variability in AI-generated evaluations and
+supports meaningful comparison across participants.
+To verify the reliability of the AI-generated scores, a subset of participant responses will
+be independently evaluated by an experienced technology professional with more than 30
+years of industry experience using the same evaluation rubric. The agreement between
+the human evaluator and the AI-generated scores will be analyzed to assess the
+consistency and reliability of the AI-based evaluation.
+Rubric Definition
+Each evaluation dimension will be scored using a five-level rubric.
+Table 3: Evaluation dimensions - rubric definition
+Score Description
+1 Poor – major weaknesses, question not adequately addressed
+2 Fair – partially addresses question with significant gaps
+3 Satisfactory – addresses question but lacks depth or clarity
+4 Good – well-structured and mostly complete response
+5 Excellent – clear, relevant, technically accurate, and comprehensive response
+The AI evaluator will receive these definitions as part of the scoring prompt to improve
+consistency.
+The evaluation output is represented as:
+Score = [R, S, T, C]
+where:
+• R= Content Relevance
+10
+• S= Structure and Organization
+• T= Technical Accuracy
+• C= Communication Clarity
+Since the objective of this study is to provide an interpretable overall performance
+indicator rather than optimize predictive accuracy, equal weighting is initially assigned to
+all four evaluation dimensions. This approach follows commonly used educational
+assessment practices in which multiple criteria are treated with equal importance to
+ensure transparency and ease of interpretation. Universities frequently employ analytic
+rubrics with rating scales such as 1–5 or 1–4 for evaluating presentations, essays, reports,
+and oral communication. Examples include the AAC&U VALUE Rubrics, Oral
+Communication Rubrics, and Written Communication Rubrics. Motivated by these
+established practices, this study adopts a 1–5 scale for interview evaluation.
+The overall performance score is computed as the average of the evaluation dimensions:
+R + S + T + C
+Overall Score =
+4 (1)
+where R represents Content Relevance, S represents Structure and Organization, T
+represents Technical Accuracy, and C represents Communication Clarity. The resulting
+values from Equation (1) are visualized using radar charts to help users identify strengths
+and weaknesses across multiple performance dimensions. Radar-chart visualization
+further supports comparison between interview sessions and enables more intuitive
+interpretation of AI-generated feedback than text-based feedback alone.
+B. User Confidence Evaluation
+User confidence is evaluated as a secondary outcome independently from AI-based
+performance scoring through pre–post questionnaires administered before and after
+using the system. While the primary objective of this research is to measure learning
+improvement through changes in interview-response quality, confidence measures are
+included to examine whether structured feedback also influences interview readiness and
+self-perception. Participants rate a series of statements using a five-point Likert scale,
+where 1 indicates strongly disagree and 5 indicates strongly agree. The questionnaire
+includes statements such as: “I feel confident answering interview questions,” “I know
+how to structure my responses,” “I understand my areas for improvement,” and “I feel
+more prepared for interviews.” These measures are intended to capture changes in
+interview readiness and self-perceived confidence.
+11
+Confidence improvement will be calculated as:
+Confidence Gain = PostConfidence − PreConfidence (2)
+where PreConfidence represents the average questionnaire score before interview
+practice and PostConfidence represents the average score after completing the interview
+sessions. Positive values indicate increased confidence following practice, values equal to
+zero indicate no change, and negative values indicate reduced confidence. Separating
+subjective confidence measures from objective AI-generated scores improves
+interpretability and allows different aspects of learning outcomes to be analyzed
+independently.
+C. Consistency and Reproducibility Controls
+Because generative AI models may produce varying outputs across repeated executions,
+this study incorporates several controls to improve consistency and reproducibility.
+Controlled prompting techniques are used, including fixed evaluation templates,
+predefined scoring rubrics, low-temperature inference settings, and standardized
+interview scenarios for all participants. Structured output formats such as JSON are also
+used to ensure consistent score generation and easier downstream processing.
+These controls are designed to reduce variability introduced by language models and
+improve comparability across users and experimental sessions. By separating objective
+AI-based assessment from subjective confidence evaluation, the proposed framework
+seeks to reduce evaluation bias while maintaining interpretability and reproducibility of
+results.
+D. Score Calibration
+To further reduce scoring variability, the AI evaluation system employs predefined rubrics
+and fixed evaluation prompts. A benchmark dataset consisting of sample interview
+responses representing different quality levels will be created. Prior to participant
+evaluation, the AI scoring system will be tested repeatedly using these benchmark
+responses to verify whether scores remain consistent across multiple evaluations.
+The benchmark responses serve as reference anchors for the scoring scale and provide a
+mechanism for calibrating AI-generated evaluations. This calibration process helps
+ensure that scores assigned by the system remain stable and comparable across different
+users and interview sessions.
+E. Learning Gain
+12
+The primary outcome of this study is learning improvement. For each interview question,
+participants submit an initial response and a revised response after receiving structured
+AI-generated feedback. Both responses are evaluated using the same rubric-based
+assessment framework. Learning improvement is calculated as:
+𝐿𝑒𝑎𝑟𝑛𝑖𝑛𝑔 𝐺𝑎𝑖𝑛 = 𝑅𝑒𝑣𝑖𝑠𝑒𝑑 𝑆𝑐𝑜𝑟𝑒 − 𝐼𝑛𝑖𝑡𝑖𝑎𝑙 𝑆𝑐𝑜𝑟𝑒 (3)
+Positive values from Equation (3) indicate improvement following feedback. Average
+learning gain across all questions and participants will be used as the primary indicator
+of educational effectiveness.
+This approach allows the study to directly evaluate whether structured AI-generated
+feedback helps learners improve the quality of their interview responses and understand
+how to revise them.
+Reproducibility and Experimental Control
+Since generative AI outputs may vary across executions, this study adopts several
+experimental controls to improve reproducibility. All participants receive identical
+system prompts, evaluation rubrics, and scoring instructions to ensure consistency in
+question generation and evaluation. The language model configuration is also fixed by
+using the same model version, temperature settings, and token limits throughout the
+study.
+Furthermore, the evaluation pipeline separates question generation from response
+scoring. Question generation follows the sequence: Role → Prompt → Question, while
+evaluation follows the sequence: Response → Rubric → Score. All prompts, outputs, and
+evaluation results are logged and stored for later analysis. These controls reduce variation
+caused by conversational drift and enable meaningful comparison across participants and
+interview sessions.
+Data Analysis
+The collected data will be analyzed using both quantitative and qualitative methods.
+Quantitative analysis will focus on measuring learning improvement by comparing rubric
+scores between participants’ initial responses and revised responses after receiving AI-
+generated feedback. Improvements in relevance, structure, clarity, technical accuracy,
+and communication will be examined to identify which dimensions benefit most from
+structured feedback.
+Qualitative data obtained from participant questionnaires and open-ended feedback will
+be analyzed thematically to understand user perceptions of feedback usefulness,
+strengths of the system, and areas requiring improvement.
+13
+Radar chart comparisons will be used to visually analyze changes across performance
+dimensions, enabling identification of specific areas of skill development between initial
+and revised responses.
+To analyze overall changes in confidence, the mean confidence gain across participants
+will be calculated:
+∑Confidence Gain
+N (4)
+Mean Confidence Gain =
+where N represents the number of participants. The confidence scores obtained from
+Equation (3) will be used to measure learning effects, determine whether repeated
+interview practice improves self-perceived preparedness, and analyze whether
+improvements in performance dimensions correspond with increases in confidence.
+These analyses will also help evaluate whether structured AI-generated feedback
+contributes to improved interview readiness.
+Ethical Considerations
+This study will be conducted in accordance with relevant ethical guidelines for research
+involving human participants. Participation will be voluntary, and informed consent will
+be obtained before data collection. Participants will be informed of the purpose of the
+study, the procedures involved, and their right to withdraw at any time without penalty.
+To protect privacy, all collected data will be anonymized before analysis, and personally
+identifiable information will not be included in research outputs. The study will collect
+interview responses, AI-generated feedback, questionnaire responses, and related
+evaluation data solely for research purposes. The AI system will be used as a research
+tool to generate and evaluate interview feedback, and all data will be stored securely and
+accessed only by the researcher. Ethical approval and institutional requirements will be
+followed prior to conducting the study.
+Scope and Limitations
+The scope of this research is limited to interview preparation within selected domains and
+companies. While the system aims to simulate realistic interview scenarios, it may not
+capture the full variability of real-world interviews. Furthermore, the evaluation is
+conducted on a limited user group, which may affect the generalizability of the results.
+The evaluation framework relies on AI-generated assessments and predefined rubrics,
+which may not fully represent human judgments in all situations. Future work may
+explore larger participant groups, multimodal analysis, and comparisons with expert
+human evaluators to further validate the proposed framework.
+14
+Research Process Flow
+The research follows a sequential process beginning with proposal development and
+literature review, followed by proposal presentation and system design. Subsequent
+stages include dataset collection and preparation, prompt design and implementation,
+prototype development, testing, evaluation, data analysis, and final report writing. This
+structured workflow ensures systematic development and evaluation of the proposed
+interview coaching system.
+9. Evaluation Criteria
+The proposed prototype will be evaluated using both objective and subjective measures
+to investigate whether structured AI-generated feedback supports learning during
+technical interview preparation.
+The primary evaluation focuses on learning improvement. During a mock interview
+session, participants answer five technical interview questions. For each question, they
+first submit an initial response, receive structured AI-generated feedback based on a
+predefined rubric, revise their response, and submit an improved version. Initial and
+revised responses are evaluated using the same rubric covering relevance, structure,
+clarity, technical accuracy, and communication. Learning improvement is measured by
+comparing the rubric scores before and after revision.
+Radar-chart visualization is used to present changes across the evaluation dimensions
+and help participants interpret their strengths and weaknesses. Participants also
+complete pre- and post-session questionnaires to evaluate perceived confidence and the
+usefulness of the feedback. Confidence is treated as a secondary outcome, while
+improvement in interview-response quality is the primary measure of educational
+effectiveness.
+To verify the reliability of AI-generated scores, a subset of participant responses will be
+independently evaluated by an experienced technology professional with more than 30
+years of industry experience using the same evaluation rubric. Agreement between the
+human and AI evaluations will be analyzed to assess the consistency of the scoring process.
+10. Expected Contribution
+This research contributes to the field of AI-assisted educational technology by
+investigating whether structured AI-generated feedback can improve student learning
+during interview preparation. Unlike existing interview coaching tools that primarily
+provide conversational feedback, the proposed framework focuses on helping students
+understand, revise, and improve their responses through rubric-based evaluation and
+visual feedback.
+15
+The study introduces a structured evaluation framework that assesses interview
+responses across multiple dimensions, including relevance, structure, clarity, technical
+accuracy, and communication. By combining standardized scoring with radar-chart
+visualization, the system aims to make feedback more interpretable and actionable for
+learners.
+A further contribution of this research is the use of revision-based learning assessment.
+By comparing students’ initial and revised responses after receiving AI-generated
+feedback, the study provides evidence of learning improvement rather than relying solely
+on user satisfaction or confidence measures.
+The research also contributes to understanding how students perceive and utilize AI-
+generated feedback during interview preparation. The findings may provide insights into
+the design of future AI-supported learning systems that emphasize feedback quality,
+interpretability, and measurable learning outcomes.

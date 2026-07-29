@@ -1,0 +1,1186 @@
+{
+  "/AiInterviewCoachStack": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/BedrockModelId": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BedrockModelId"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:18:28)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/DbConnectionString": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbConnectionString"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:24:32)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/PromptTemplateVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PromptTemplateVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:30:35)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ClerkJwksUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ClerkJwksUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:36:26)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ApiWafWebAcl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiWafWebAcl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:255:19)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/WafApiGatewayAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WafApiGatewayAssociation"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:320:28)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ApiGatewayUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiGatewayUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:327:5)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/FrontendBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "FrontendBucketName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:332:5)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/WebAclArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebAclArn"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:337:5)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...App.synth in aws-cdk-lib...",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:15:5)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...App.synth in aws-cdk-lib...",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:15:5)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/FrontendBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "FrontendBucketEFE2E19C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:42:27)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/LambdaExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LambdaExecutionRoleD5C26073"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Role2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:61:24)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ProfileManagement/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ProfileManagement645090E6"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:95:31)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/SessionManagement/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SessionManagement1B9EAF1E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:103:31)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/QuestionGeneration/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "QuestionGeneration70B31147"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:111:32)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ResponseEvaluation/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ResponseEvaluationFB0FBBE4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:121:32)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/SessionHistory/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "SessionHistory785ABEC4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:131:28)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ConfidenceQuestionnaire/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ConfidenceQuestionnaireBD46B89E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:139:37)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ProgressAnalytics/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ProgressAnalytics6C324FE5"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:147:31)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ClerkJwtAuthorizer/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ClerkJwtAuthorizer35FB738B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:156:29)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ClerkJwtAuthorizer/AiInterviewCoachStackClerkTokenAuthorizer40DCA4B5:Permissions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ClerkJwtAuthorizerAiInterviewCoachStackClerkTokenAuthorizer40DCA4B5Permissions15982A70"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new TokenAuthorizer2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:193:29)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApi8C5DEB32"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Account": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiAccountE6435425"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Endpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiEndpointA9C9913A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/ClerkTokenAuthorizer/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ClerkTokenAuthorizerD1516320"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new TokenAuthorizer2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:193:29)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...App.synth in aws-cdk-lib...",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:15:5)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/LambdaExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "LambdaExecutionRoleDefaultPolicy6D69732F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:69:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/CloudWatchRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiCloudWatchRoleD444AA9F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Deployment/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiDeployment376D1E3Cd0d9795bfa4b8d08a562be5676e6c921"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/DeploymentStage.prod/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiDeploymentStageprodB107E49B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiOPTIONSCD43E940"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new RestApi2 in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:171:16)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapi5B40A3D5"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...RootResource.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:200:35)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiOPTIONS2E65EC15"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...RootResource.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:200:35)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofile5620FA95"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:203:37)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessions83FF3D05"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:215:38)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalytics2F6B165E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:248:39)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofileOPTIONSFDE3A241"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:203:37)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.profile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofilePOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapiprofile71F88413"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:204:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.profile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofilePOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapiprofile577281F1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:204:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/POST/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofilePOST2AD3AF9B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:204:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.profile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofileGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapiprofileF8DF9986"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:207:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.profile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofileGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapiprofileA154A37F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:207:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/GET/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofileGET9FEE11D4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:207:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/PUT/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.PUT..api.profile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofilePUTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508PUTapiprofileF4901485"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:210:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/PUT/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.PUT..api.profile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofilePUTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508PUTapiprofile7CB9C9C0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:210:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/profile/PUT/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapiprofilePUT6D5A08DA"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:210:21)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsOPTIONS848CCBC2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:215:38)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsPOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionsE0B81E24"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:216:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsPOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessions7607453B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:216:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/POST/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsPOST3B5B1D53"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:216:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessions1DBBBE11"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:219:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessions794B458B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:219:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/GET/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionsGET9FF5A27A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:219:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionId1C0B01A0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:224:50)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalyticsOPTIONS0F85FE3B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:248:39)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalyticsprogress1E6B93A7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:249:48)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdOPTIONS818EFE23"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:224:50)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions.{sessionId}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessionssessionId494639DA"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:225:25)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.sessions.{sessionId}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapisessionssessionId3CD6E4D8"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:225:25)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/GET/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdGETE245A6DF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:225:25)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdquestions393E9E02"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:230:51)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdevaluate195EDE0E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:236:50)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdconfidenceCC085262"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:242:52)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalyticsprogressOPTIONS02A3DD04"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:249:48)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/GET/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.analytics.progress": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalyticsprogressGETApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapianalyticsprogressD3C9F72A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:250:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/GET/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.GET..api.analytics.progress": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalyticsprogressGETApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508GETapianalyticsprogress17EEE7CF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:250:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/analytics/progress/GET/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapianalyticsprogressGET57B3B13E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:250:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdquestionsOPTIONS6224EDD4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:230:51)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.questions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdquestionsPOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdquestionsB9D6F50A"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:231:23)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.questions": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdquestionsPOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdquestions4DF1EB75"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:231:23)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/questions/POST/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdquestionsPOST4DBC59BF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:231:23)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdevaluateOPTIONS59A90160"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:236:50)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.evaluate": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdevaluatePOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdevaluate0BE67796"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:237:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.evaluate": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdevaluatePOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdevaluate8E06AC56"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:237:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/evaluate/POST/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdevaluatePOST219A6784"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:237:22)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/OPTIONS/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdconfidenceOPTIONS34E3EE5C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addResource in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:242:52)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)"
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/POST/ApiPermission.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.confidence": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdconfidencePOSTApiPermissionAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdconfidence58E4DF2B"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:243:24)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/POST/ApiPermission.Test.AiInterviewCoachStackAiInterviewCoachApi39A9F508.POST..api.sessions.{sessionId}.confidence": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdconfidencePOSTApiPermissionTestAiInterviewCoachStackAiInterviewCoachApi39A9F508POSTapisessionssessionIdconfidence38703DD1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:243:24)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node..."
+      ]
+    }
+  ],
+  "/AiInterviewCoachStack/AiInterviewCoachApi/Default/api/sessions/{sessionId}/confidence/POST/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiInterviewCoachApiapisessionssessionIdconfidencePOST47D12AEF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.addMethod in aws-cdk-lib...",
+        "new AiInterviewCoachStack (/Users/Pakaur2601/r/infrastructure/src/stacks/ai-interview-coach-stack.ts:243:24)",
+        "<anonymous> (/Users/Pakaur2601/r/infrastructure/src/app.ts:7:1)",
+        "...node internals, ts-node, ts-node..."
+      ]
+    }
+  ]
+}
