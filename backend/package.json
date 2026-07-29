@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "tsc",
+    "build": "cd ../frontend && npm install && npx vite build",
+    "start": "cd .. && npm run migrate; tsx backend/src/server.ts",
     "migrate": "tsx src/migrate.ts"
   },
   "dependencies": {
