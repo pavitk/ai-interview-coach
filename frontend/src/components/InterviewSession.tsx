@@ -126,27 +126,45 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
   const speakQuestion = useCallback((text: string) => {
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
+    const speak = () => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utteranceRef.current = utterance;
 
-    // Try to find a natural English voice
+      const voices = window.speechSynthesis.getVoices();
+      const naturalVoice = voices.find(v =>
+        v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel'))
+      ) || voices.find(v => v.lang.startsWith('en'));
+
+      if (naturalVoice) {
+        utterance.voice = naturalVoice;
+      }
+
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    };
+
+    // Voices may not be loaded yet — wait for them
     const voices = window.speechSynthesis.getVoices();
-    const naturalVoice = voices.find(v =>
-      v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel'))
-    ) || voices.find(v => v.lang.startsWith('en'));
-
-    if (naturalVoice) {
-      utterance.voice = naturalVoice;
+    if (voices.length > 0) {
+      speak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        speak();
+        window.speechSynthesis.onvoiceschanged = null;
+      };
+      // Fallback: try speaking anyway after a short delay
+      setTimeout(() => {
+        if (!utteranceRef.current || !window.speechSynthesis.speaking) {
+          speak();
+        }
+      }, 500);
     }
-
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
   }, []);
 
   const replayAudio = () => {
