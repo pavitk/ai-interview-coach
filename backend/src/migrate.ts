@@ -24,7 +24,8 @@ async function runMigrations() {
     console.error('❌ Migration failed:', err.message || err);
     console.error('   Detail:', err.detail || 'none');
     console.error('   Hint:', err.hint || 'none');
-    process.exit(1);
+    // Don't exit — let the server start anyway
+    console.log('⚠️  Server will start without migrations. Database may be empty.');
   } finally {
     await closePool();
   }
