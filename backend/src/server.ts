@@ -151,12 +151,28 @@ app.get('/api/sessions/:id', async (req, res) => {
         e.technical_accuracy,
         e.communication_clarity,
         e.overall_score as question_score,
-        e.feedback
+        e.feedback,
+        rr.response_text as revised_response_text,
+        re.content_relevance as revised_content_relevance,
+        re.structure_organization as revised_structure_organization,
+        re.technical_accuracy as revised_technical_accuracy,
+        re.communication_clarity as revised_communication_clarity,
+        re.overall_score as revised_overall_score,
+        re.feedback as revised_feedback
        FROM questions q
        LEFT JOIN responses r ON r.question_id = q.id
        LEFT JOIN evaluations e ON e.response_id = r.id
+       LEFT JOIN revised_responses rr ON rr.question_id = q.id
+       LEFT JOIN revised_evaluations re ON re.revised_response_id = rr.id
        WHERE q.session_id = $1
        ORDER BY q.question_index`,
+      [id],
+      { mode: 'read' }
+    );
+
+    // Get confidence data
+    const confidenceResult = await query(
+      'SELECT * FROM confidence_questionnaires WHERE session_id = $1 ORDER BY type',
       [id],
       { mode: 'read' }
     );
@@ -164,6 +180,7 @@ app.get('/api/sessions/:id', async (req, res) => {
     return res.json({
       ...session,
       questions: questionsResult.rows,
+      confidence: confidenceResult.rows,
     });
   } catch (err: any) {
     console.error('GET /api/sessions/:id error:', err.message);
@@ -198,6 +215,19 @@ app.post('/api/sessions/:id/questions', async (req, res) => {
     const userExperience = sessionResult.rows[0]?.experience || 0;
     const userBackground = sessionResult.rows[0]?.background || '';
 
+    // Get previous question scores from this session for adaptive difficulty
+    const prevScoresResult = await query(
+      `SELECT e.overall_score
+       FROM evaluations e
+       JOIN responses r ON e.response_id = r.id
+       JOIN questions q ON r.question_id = q.id
+       WHERE q.session_id = $1
+       ORDER BY q.question_index ASC`,
+      [sessionId],
+      { mode: 'read' }
+    );
+    const previousScores = prevScoresResult.rows.map((r: any) => parseFloat(r.overall_score));
+
     // Generate question using AI
     const prompt = buildQuestionPrompt({
       questionIndex: question_index,
@@ -205,6 +235,7 @@ app.post('/api/sessions/:id/questions', async (req, res) => {
       role: userRole,
       experience: userExperience,
       background: userBackground,
+      previousScores,
     });
 
     const aiResponse = await invokeAI(prompt, TEMPERATURE_SETTINGS.generation);
@@ -333,10 +364,146 @@ app.post('/api/sessions/:id/evaluate', async (req, res) => {
       );
     }
 
-    return res.json(evalResult.rows[0]);
+    return res.json({ ...evalResult.rows[0], response_id: responseId });
   } catch (err: any) {
     console.error('POST /api/sessions/:id/evaluate error:', err.message);
     return res.status(500).json({ error: 'Failed to evaluate response' });
+  }
+});
+
+// ─── REVISED RESPONSE & RE-EVALUATION ──────────────────────────────────────────
+
+/**
+ * POST /api/sessions/:id/revise - Submit a revised response and get re-evaluation
+ * Body: { question_id: string, original_response_id: string, response_text: string }
+ * Returns: revised evaluation scores + feedback
+ */
+app.post('/api/sessions/:id/revise', async (req, res) => {
+  try {
+    const { id: sessionId } = req.params;
+    const { question_id, original_response_id, response_text } = req.body;
+
+    if (!question_id || !original_response_id || !response_text) {
+      return res.status(400).json({ error: 'question_id, original_response_id, and response_text are required' });
+    }
+
+    // Get the question text
+    const questionResult = await query(
+      'SELECT question_text FROM questions WHERE id = $1 AND session_id = $2',
+      [question_id, sessionId],
+      { mode: 'read' }
+    );
+
+    if (questionResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Question not found' });
+    }
+
+    const questionText = questionResult.rows[0].question_text;
+
+    // Store the revised response
+    const revisedResult = await query(
+      'INSERT INTO revised_responses (question_id, original_response_id, response_text) VALUES ($1, $2, $3) RETURNING id',
+      [question_id, original_response_id, response_text]
+    );
+    const revisedResponseId = revisedResult.rows[0].id;
+
+    // Evaluate revised response with AI (same rubric)
+    const evalPrompt = buildEvaluationPrompt(questionText, response_text);
+    const aiResponse = await invokeAI(evalPrompt, TEMPERATURE_SETTINGS.evaluation);
+
+    let evaluation;
+    try {
+      evaluation = JSON.parse(aiResponse);
+    } catch {
+      console.error('Failed to parse AI evaluation for revision:', aiResponse);
+      return res.status(500).json({ error: 'AI returned invalid evaluation format' });
+    }
+
+    const { scores, feedback } = evaluation;
+    const overallScore = (
+      (scores.contentRelevance + scores.structureOrganization +
+       scores.technicalAccuracy + scores.communicationClarity) / 4
+    ).toFixed(1);
+
+    // Store revised evaluation
+    const evalResult = await query(
+      `INSERT INTO revised_evaluations (revised_response_id, content_relevance, structure_organization, technical_accuracy, communication_clarity, overall_score, feedback)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, content_relevance, structure_organization, technical_accuracy, communication_clarity, overall_score, feedback`,
+      [revisedResponseId, scores.contentRelevance, scores.structureOrganization, scores.technicalAccuracy, scores.communicationClarity, overallScore, JSON.stringify(feedback)]
+    );
+
+    return res.json(evalResult.rows[0]);
+  } catch (err: any) {
+    console.error('POST /api/sessions/:id/revise error:', err.message);
+    return res.status(500).json({ error: 'Failed to evaluate revised response' });
+  }
+});
+
+// ─── CONFIDENCE QUESTIONNAIRE ──────────────────────────────────────────────────
+
+/**
+ * POST /api/sessions/:id/confidence - Submit pre or post confidence questionnaire
+ * Body: { type: 'pre' | 'post', responses: [q1, q2, q3, q4] (1-5 each) }
+ */
+app.post('/api/sessions/:id/confidence', async (req, res) => {
+  try {
+    const { id: sessionId } = req.params;
+    const { type, responses } = req.body;
+
+    if (!type || !['pre', 'post'].includes(type)) {
+      return res.status(400).json({ error: 'type must be "pre" or "post"' });
+    }
+
+    if (!responses || !Array.isArray(responses) || responses.length !== 4) {
+      return res.status(400).json({ error: 'responses must be an array of 4 scores (1-5)' });
+    }
+
+    // Validate each score is 1-5
+    for (const score of responses) {
+      if (typeof score !== 'number' || score < 1 || score > 5) {
+        return res.status(400).json({ error: 'Each response score must be between 1 and 5' });
+      }
+    }
+
+    const averageScore = (responses[0] + responses[1] + responses[2] + responses[3]) / 4;
+
+    const result = await query(
+      `INSERT INTO confidence_questionnaires (session_id, type, q1_score, q2_score, q3_score, q4_score, average_score)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (session_id, type) DO UPDATE SET
+         q1_score = EXCLUDED.q1_score,
+         q2_score = EXCLUDED.q2_score,
+         q3_score = EXCLUDED.q3_score,
+         q4_score = EXCLUDED.q4_score,
+         average_score = EXCLUDED.average_score,
+         submitted_at = NOW()
+       RETURNING id, type, q1_score, q2_score, q3_score, q4_score, average_score`,
+      [sessionId, type, responses[0], responses[1], responses[2], responses[3], averageScore.toFixed(2)]
+    );
+
+    return res.json(result.rows[0]);
+  } catch (err: any) {
+    console.error('POST /api/sessions/:id/confidence error:', err.message);
+    return res.status(500).json({ error: 'Failed to save confidence questionnaire' });
+  }
+});
+
+/**
+ * GET /api/sessions/:id/confidence - Get confidence data for a session
+ */
+app.get('/api/sessions/:id/confidence', async (req, res) => {
+  try {
+    const { id: sessionId } = req.params;
+    const result = await query(
+      'SELECT * FROM confidence_questionnaires WHERE session_id = $1 ORDER BY type',
+      [sessionId],
+      { mode: 'read' }
+    );
+    return res.json(result.rows);
+  } catch (err: any) {
+    console.error('GET /api/sessions/:id/confidence error:', err.message);
+    return res.status(500).json({ error: 'Failed to fetch confidence data' });
   }
 });
 
@@ -378,23 +545,63 @@ app.post('/api/sessions/:id/track', async (req, res) => {
 
 /**
  * GET /api/users/:id/progress - Get scores over time for progress chart
- * Returns: Array of { session_number, overall_score, started_at }
+ * Returns: Array of { session_number, overall_score, dimensions, learning_gain, started_at }
  */
 app.get('/api/users/:id/progress', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Get sessions with per-dimension averages
     const result = await query(
-      `SELECT id, overall_score, started_at, completed_at
-       FROM sessions
-       WHERE user_id = $1 AND completed_at IS NOT NULL AND overall_score IS NOT NULL
-       ORDER BY started_at ASC`,
+      `SELECT 
+        s.id, s.overall_score, s.started_at, s.completed_at,
+        AVG(e.content_relevance) as avg_content_relevance,
+        AVG(e.structure_organization) as avg_structure_organization,
+        AVG(e.technical_accuracy) as avg_technical_accuracy,
+        AVG(e.communication_clarity) as avg_communication_clarity,
+        AVG(re.overall_score) as avg_revised_score
+       FROM sessions s
+       LEFT JOIN questions q ON q.session_id = s.id
+       LEFT JOIN responses r ON r.question_id = q.id
+       LEFT JOIN evaluations e ON e.response_id = r.id
+       LEFT JOIN revised_responses rr ON rr.question_id = q.id
+       LEFT JOIN revised_evaluations re ON re.revised_response_id = rr.id
+       WHERE s.user_id = $1 AND s.completed_at IS NOT NULL AND s.overall_score IS NOT NULL
+       GROUP BY s.id, s.overall_score, s.started_at, s.completed_at
+       ORDER BY s.started_at ASC`,
       [id],
       { mode: 'read' }
     );
 
+    // Get confidence data for each session
+    const confidenceResult = await query(
+      `SELECT cq.session_id, cq.type, cq.average_score
+       FROM confidence_questionnaires cq
+       JOIN sessions s ON s.id = cq.session_id
+       WHERE s.user_id = $1`,
+      [id],
+      { mode: 'read' }
+    );
+
+    const confidenceMap: Record<string, { pre?: number; post?: number }> = {};
+    for (const row of confidenceResult.rows) {
+      if (!confidenceMap[row.session_id]) confidenceMap[row.session_id] = {};
+      confidenceMap[row.session_id][row.type as 'pre' | 'post'] = parseFloat(row.average_score);
+    }
+
     const progress = result.rows.map((row, index) => ({
       session_number: index + 1,
+      session_id: row.id,
       overall_score: parseFloat(row.overall_score),
+      dimensions: {
+        contentRelevance: row.avg_content_relevance ? parseFloat(row.avg_content_relevance) : null,
+        structureOrganization: row.avg_structure_organization ? parseFloat(row.avg_structure_organization) : null,
+        technicalAccuracy: row.avg_technical_accuracy ? parseFloat(row.avg_technical_accuracy) : null,
+        communicationClarity: row.avg_communication_clarity ? parseFloat(row.avg_communication_clarity) : null,
+      },
+      revised_score: row.avg_revised_score ? parseFloat(row.avg_revised_score) : null,
+      learning_gain: row.avg_revised_score ? parseFloat((parseFloat(row.avg_revised_score) - parseFloat(row.overall_score)).toFixed(1)) : null,
+      confidence: confidenceMap[row.id] || null,
       started_at: row.started_at,
       completed_at: row.completed_at,
     }));

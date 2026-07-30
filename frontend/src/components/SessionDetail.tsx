@@ -13,6 +13,22 @@ interface QuestionDetail {
   communication_clarity: number | null;
   question_score: number | null;
   feedback: Record<string, { text: string; suggestions: string[] }> | null;
+  revised_response_text: string | null;
+  revised_content_relevance: number | null;
+  revised_structure_organization: number | null;
+  revised_technical_accuracy: number | null;
+  revised_communication_clarity: number | null;
+  revised_overall_score: number | null;
+  revised_feedback: Record<string, { text: string; suggestions: string[] }> | null;
+}
+
+interface ConfidenceData {
+  type: 'pre' | 'post';
+  q1_score: number;
+  q2_score: number;
+  q3_score: number;
+  q4_score: number;
+  average_score: number;
 }
 
 interface SessionData {
@@ -21,6 +37,7 @@ interface SessionData {
   started_at: string;
   completed_at: string | null;
   questions: QuestionDetail[];
+  confidence: ConfidenceData[];
 }
 
 function getScoreColor(score: number): string {
@@ -212,11 +229,76 @@ export default function SessionDetail() {
                     </div>
                   </div>
                 )}
+
+                {/* Revised Response */}
+                {q.revised_response_text && (
+                  <div className="border-t border-white/5 pt-4 mt-4">
+                    <p className="text-emerald-400 text-xs font-medium uppercase mb-2">📝 Revised Response</p>
+                    <p className="text-slate-300 text-sm bg-emerald-500/5 p-3 rounded-lg border border-emerald-500/10">{q.revised_response_text}</p>
+
+                    {/* Revised Scores comparison */}
+                    {q.revised_content_relevance !== null && (
+                      <div className="mt-3">
+                        <p className="text-slate-500 text-xs font-medium uppercase mb-2">Score Improvement</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { label: 'Content Relevance', initial: q.content_relevance, revised: q.revised_content_relevance },
+                            { label: 'Structure', initial: q.structure_organization, revised: q.revised_structure_organization },
+                            { label: 'Technical Accuracy', initial: q.technical_accuracy, revised: q.revised_technical_accuracy },
+                            { label: 'Communication', initial: q.communication_clarity, revised: q.revised_communication_clarity },
+                          ].map((dim) => {
+                            const diff = (dim.revised || 0) - (dim.initial || 0);
+                            return (
+                              <div key={dim.label} className="flex items-center justify-between p-2 bg-white/3 rounded-lg">
+                                <span className="text-slate-400 text-xs">{dim.label}</span>
+                                <span className="text-xs">
+                                  <span className="text-slate-500">{dim.initial ? parseFloat(String(dim.initial)).toFixed(1) : '-'}</span>
+                                  <span className="text-slate-600 mx-1">→</span>
+                                  <span className={`font-semibold ${getScoreColor(dim.revised || 0)}`}>{dim.revised ? parseFloat(String(dim.revised)).toFixed(1) : '-'}</span>
+                                  <span className={`ml-1 ${diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-400' : 'text-slate-500'}`}>
+                                    ({diff > 0 ? '+' : ''}{diff.toFixed(1)})
+                                  </span>
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
         ))}
       </div>
+
+      {/* Confidence Questionnaire Results */}
+      {session.confidence && session.confidence.length > 0 && (
+        <div className="mt-6 glass-card p-6 fade-in" style={{ animationDelay: '0.3s' }}>
+          <h3 className="text-white font-medium mb-4">Confidence Questionnaire</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {session.confidence.map((c) => (
+              <div key={c.type} className="p-4 bg-white/3 rounded-lg">
+                <p className="text-slate-400 text-xs font-medium uppercase mb-2">{c.type === 'pre' ? 'Before Session' : 'After Session'}</p>
+                <p className={`text-xl font-bold ${getScoreColor(c.average_score)}`}>
+                  {parseFloat(String(c.average_score)).toFixed(1)}/5
+                </p>
+                <p className="text-slate-500 text-xs mt-1">Average of 4 statements</p>
+              </div>
+            ))}
+          </div>
+          {session.confidence.length === 2 && (
+            <div className="mt-3 text-center">
+              <span className="text-slate-400 text-sm">Confidence Change: </span>
+              <span className={`font-semibold ${(session.confidence[1].average_score - session.confidence[0].average_score) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {(session.confidence[1].average_score - session.confidence[0].average_score) >= 0 ? '+' : ''}
+                {(session.confidence[1].average_score - session.confidence[0].average_score).toFixed(1)}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
