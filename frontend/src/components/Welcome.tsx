@@ -6,6 +6,7 @@ interface WelcomeProps {
 }
 
 export default function Welcome({ onLogin }: WelcomeProps) {
+  const [mode, setMode] = useState<'choose' | 'new' | 'returning'>('choose');
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [experience, setExperience] = useState('');
@@ -13,6 +14,41 @@ export default function Welcome({ onLogin }: WelcomeProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Returning user — just send name, backend finds existing
+  const handleReturningSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim() }),
+      });
+
+      if (!res.ok) throw new Error('Failed to connect');
+
+      const user = await res.json();
+      if (!user.role && !user.experience) {
+        setError('No account found with that name. Try registering as a new user.');
+        setLoading(false);
+        return;
+      }
+      onLogin(user);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // New user — full form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -77,94 +113,150 @@ export default function Welcome({ onLogin }: WelcomeProps) {
 
         {/* Login Card */}
         <div className="glass-card p-8 fade-in" style={{ animationDelay: '0.2s' }}>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
-                What's your name?
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name to get started"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
-                autoFocus
-                disabled={loading}
-              />
+          {/* Mode Selection */}
+          {mode === 'choose' && (
+            <div className="space-y-4">
+              <button
+                onClick={() => setMode('returning')}
+                className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-3"
+              >
+                <span className="text-xl">👋</span>
+                I've used this before
+              </button>
+              <button
+                onClick={() => setMode('new')}
+                className="w-full py-4 px-6 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-3"
+              >
+                <span className="text-xl">✨</span>
+                I'm new here
+              </button>
             </div>
+          )}
 
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-slate-300 mb-2">
-                Target Role
-              </label>
-              <input
-                id="role"
-                type="text"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                placeholder="e.g., Backend Engineer, Data Scientist"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
-                disabled={loading}
-              />
-            </div>
+          {/* Returning User — just name */}
+          {mode === 'returning' && (
+            <form onSubmit={handleReturningSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
+                  Enter your name to continue
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name as registered"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  autoFocus
+                  disabled={loading}
+                />
+              </div>
 
-            <div>
-              <label htmlFor="experience" className="block text-sm font-medium text-slate-300 mb-2">
-                Years of Experience
-              </label>
-              <input
-                id="experience"
-                type="text"
-                inputMode="numeric"
-                value={experience}
-                onChange={(e) => setExperience(e.target.value.replace(/[^0-9]/g, ''))}
-                placeholder="e.g., 3"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
-                disabled={loading}
-              />
-            </div>
+              {error && <p className="text-red-400 text-sm">{error}</p>}
 
-            <div>
-              <label htmlFor="background" className="block text-sm font-medium text-slate-300 mb-2">
-                Describe Your Experience <span className="text-slate-500">(optional)</span>
-              </label>
-              <textarea
-                id="background"
-                value={background}
-                onChange={(e) => setBackground(e.target.value)}
-                placeholder="e.g., Built microservices at a fintech startup, worked on React dashboards, experience with AWS and Kubernetes..."
-                rows={3}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all resize-none text-sm"
-                disabled={loading}
-              />
-              <p className="text-slate-600 text-xs mt-1">This helps generate questions relevant to your background</p>
-            </div>
+              <button
+                type="submit"
+                disabled={loading || !name.trim()}
+                className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Connecting...</>
+                ) : (
+                  <>Continue <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></>
+                )}
+              </button>
 
-            {error && (
-              <p className="text-red-400 text-sm">{error}</p>
-            )}
+              <button type="button" onClick={() => { setMode('choose'); setError(''); }} className="w-full text-slate-500 hover:text-slate-300 text-sm transition-colors">
+                ← Back
+              </button>
+            </form>
+          )}
 
-            <button
-              type="submit"
-              disabled={loading || !name.trim()}
-              className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                <>
-                  Start Practicing
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </>
-              )}
-            </button>
-          </form>
+          {/* New User — full form */}
+          {mode === 'new' && (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
+                  What's your name?
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name to get started"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  autoFocus
+                  disabled={loading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-slate-300 mb-2">
+                  Target Role
+                </label>
+                <input
+                  id="role"
+                  type="text"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  placeholder="e.g., Backend Engineer, Data Scientist"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  disabled={loading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="experience" className="block text-sm font-medium text-slate-300 mb-2">
+                  Years of Experience
+                </label>
+                <input
+                  id="experience"
+                  type="text"
+                  inputMode="numeric"
+                  value={experience}
+                  onChange={(e) => setExperience(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="e.g., 3"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  disabled={loading}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="background" className="block text-sm font-medium text-slate-300 mb-2">
+                  Describe Your Experience <span className="text-slate-500">(optional)</span>
+                </label>
+                <textarea
+                  id="background"
+                  value={background}
+                  onChange={(e) => setBackground(e.target.value)}
+                  placeholder="e.g., Built microservices at a fintech startup, worked on React dashboards, experience with AWS and Kubernetes..."
+                  rows={3}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all resize-none text-sm"
+                  disabled={loading}
+                />
+                <p className="text-slate-600 text-xs mt-1">This helps generate questions relevant to your background</p>
+              </div>
+
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+
+              <button
+                type="submit"
+                disabled={loading || !name.trim()}
+                className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Connecting...</>
+                ) : (
+                  <>Start Practicing <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></>
+                )}
+              </button>
+
+              <button type="button" onClick={() => { setMode('choose'); setError(''); }} className="w-full text-slate-500 hover:text-slate-300 text-sm transition-colors">
+                ← Back
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Features */}
