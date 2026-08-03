@@ -22,7 +22,7 @@ export async function invokeAI(prompt: string, temperature: number): Promise<str
  */
 async function invokeGroq(prompt: string, temperature: number, apiKey: string): Promise<string> {
   const isEvaluation = prompt.includes('CANDIDATE\'S RESPONSE:');
-  const isQuestionGen = prompt.includes('Return ONLY valid JSON with keys');
+  const isQuestionGen = prompt.includes('"skill_tested"');
 
   const messages = isEvaluation
     ? [
@@ -59,13 +59,14 @@ Return ONLY valid JSON, no markdown, no code blocks, no explanation.` },
       model: 'llama-3.3-70b-versatile',
       messages,
       temperature: isEvaluation ? 0.4 : temperature,
-      max_tokens: 2048,
+      max_tokens: 4096,
       response_format: useJsonFormat ? { type: 'json_object' } : undefined,
     }),
   });
 
   if (!response.ok) {
     const err = await response.text();
+    console.error(`Groq API error: status=${response.status}, body=${err}`);
     throw new Error(`Groq API error (${response.status}): ${err}`);
   }
 

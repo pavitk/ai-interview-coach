@@ -233,7 +233,7 @@ app.post('/api/sessions/:id/questions', async (req, res) => {
       `SELECT q.question_text FROM questions q
        JOIN sessions s ON q.session_id = s.id
        WHERE s.user_id = (SELECT user_id FROM sessions WHERE id = $1)
-       ORDER BY q.created_at DESC LIMIT 25`,
+       ORDER BY q.created_at DESC LIMIT 10`,
       [sessionId],
       { mode: 'read' }
     );
