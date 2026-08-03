@@ -228,6 +228,17 @@ app.post('/api/sessions/:id/questions', async (req, res) => {
     );
     const previousScores = prevScoresResult.rows.map((r: any) => parseFloat(r.overall_score));
 
+    // Get previously asked questions in this session AND recent past sessions to avoid repetition
+    const prevQuestionsResult = await query(
+      `SELECT q.question_text FROM questions q
+       JOIN sessions s ON q.session_id = s.id
+       WHERE s.user_id = (SELECT user_id FROM sessions WHERE id = $1)
+       ORDER BY q.created_at DESC LIMIT 25`,
+      [sessionId],
+      { mode: 'read' }
+    );
+    const previousQuestions = prevQuestionsResult.rows.map((r: any) => r.question_text);
+
     // Generate question using AI
     const prompt = buildQuestionPrompt({
       questionIndex: question_index,
@@ -236,6 +247,7 @@ app.post('/api/sessions/:id/questions', async (req, res) => {
       experience: userExperience,
       background: userBackground,
       previousScores,
+      previousQuestions,
     });
 
     const aiResponse = await invokeAI(prompt, TEMPERATURE_SETTINGS.generation);
@@ -324,18 +336,21 @@ app.post('/api/sessions/:id/evaluate', async (req, res) => {
       return res.status(500).json({ error: 'AI returned invalid evaluation format' });
     }
 
-    const { scores, feedback } = evaluation;
+    const { scores, feedback, modelAnswer } = evaluation;
     const overallScore = (
       (scores.contentRelevance + scores.structureOrganization +
        scores.technicalAccuracy + scores.communicationClarity) / 4
     ).toFixed(1);
+
+    // Include modelAnswer in the feedback JSON for storage
+    const feedbackWithModel = { ...feedback, modelAnswer: modelAnswer || null };
 
     // Store evaluation
     const evalResult = await query(
       `INSERT INTO evaluations (response_id, content_relevance, structure_organization, technical_accuracy, communication_clarity, overall_score, feedback)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, content_relevance, structure_organization, technical_accuracy, communication_clarity, overall_score, feedback`,
-      [responseId, scores.contentRelevance, scores.structureOrganization, scores.technicalAccuracy, scores.communicationClarity, overallScore, JSON.stringify(feedback)]
+      [responseId, scores.contentRelevance, scores.structureOrganization, scores.technicalAccuracy, scores.communicationClarity, overallScore, JSON.stringify(feedbackWithModel)]
     );
 
     // Check if this was the last question (question_index = 5) and update session
@@ -419,18 +434,21 @@ app.post('/api/sessions/:id/revise', async (req, res) => {
       return res.status(500).json({ error: 'AI returned invalid evaluation format' });
     }
 
-    const { scores, feedback } = evaluation;
+    const { scores, feedback, modelAnswer } = evaluation;
     const overallScore = (
       (scores.contentRelevance + scores.structureOrganization +
        scores.technicalAccuracy + scores.communicationClarity) / 4
     ).toFixed(1);
+
+    // Include modelAnswer in the feedback JSON for storage
+    const feedbackWithModel = { ...feedback, modelAnswer: modelAnswer || null };
 
     // Store revised evaluation
     const evalResult = await query(
       `INSERT INTO revised_evaluations (revised_response_id, content_relevance, structure_organization, technical_accuracy, communication_clarity, overall_score, feedback)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, content_relevance, structure_organization, technical_accuracy, communication_clarity, overall_score, feedback`,
-      [revisedResponseId, scores.contentRelevance, scores.structureOrganization, scores.technicalAccuracy, scores.communicationClarity, overallScore, JSON.stringify(feedback)]
+      [revisedResponseId, scores.contentRelevance, scores.structureOrganization, scores.technicalAccuracy, scores.communicationClarity, overallScore, JSON.stringify(feedbackWithModel)]
     );
 
     return res.json(evalResult.rows[0]);

@@ -23,6 +23,7 @@ export interface QuestionContext {
   experience: number;
   background: string;
   previousScores?: number[];
+  previousQuestions?: string[];
 }
 
 /**
@@ -74,7 +75,7 @@ function getAdaptiveDifficulty(questionIndex: number, experience: number, previo
  * Uses adaptive difficulty: starts easy, ramps based on performance.
  */
 export function buildQuestionPrompt(context: QuestionContext): string {
-  const { questionIndex, totalQuestions, role, experience, background, previousScores = [] } = context;
+  const { questionIndex, totalQuestions, role, experience, background, previousScores = [], previousQuestions = [] } = context;
   const { level, description } = getAdaptiveDifficulty(questionIndex, experience, previousScores);
 
   const backgroundContext = background
@@ -92,6 +93,12 @@ export function buildQuestionPrompt(context: QuestionContext): string {
     }`;
   }
 
+  // Previous questions to avoid repetition
+  let avoidRepetitionContext = '';
+  if (previousQuestions.length > 0) {
+    avoidRepetitionContext = `\n\nDO NOT repeat or rephrase any of these previously asked questions:\n${previousQuestions.map((q, i) => `${i + 1}. "${q}"`).join('\n')}\n\nYour question MUST be substantially different from all of the above.`;
+  }
+
   // Force different topics for each question
   const topicGuides = [
     'Focus on a CORE CONCEPT — ask them to explain a fundamental concept, definition, or how something works at a basic level. Good for warm-up.',
@@ -105,7 +112,7 @@ export function buildQuestionPrompt(context: QuestionContext): string {
 
   return `You are an expert technical interviewer conducting a real interview for a "${role}" position.
 
-Generate ONE interview question for a candidate with ${experience} years of experience.${backgroundContext}${performanceContext}
+Generate ONE interview question for a candidate with ${experience} years of experience.${backgroundContext}${performanceContext}${avoidRepetitionContext}
 
 This is question ${questionIndex} of ${totalQuestions}.
 Current difficulty: ${level.toUpperCase()}
@@ -125,6 +132,7 @@ RULES:
 - Make it specific to the "${role}" role.
 - Match the difficulty level described above. ${questionIndex === 1 ? 'This is the FIRST question — keep it confidence-building and accessible.' : ''}
 - Each of the 5 questions MUST cover a DIFFERENT topic area.
+- Do NOT repeat or rephrase any previously asked question. Be creative and varied.
 
 Return ONLY valid JSON:
 {"question": "<the interview question>", "keywords": ["keyword1", "keyword2"], "skill_tested": "<skill category>"}`;
@@ -186,6 +194,7 @@ Return ONLY valid JSON (no markdown, no explanation outside JSON):
     "structureOrganization": { "text": "<specific explanation>", "suggestions": ["<actionable improvement>"] },
     "technicalAccuracy": { "text": "<specific explanation>", "suggestions": ["<actionable improvement>"] },
     "communicationClarity": { "text": "<specific explanation>", "suggestions": ["<actionable improvement>"] }
-  }
+  },
+  "modelAnswer": "<A concise, well-structured model answer that would score 4.5-5.0. This should show the candidate what a strong response looks like — include key points, correct technical details, and good structure. Keep it to 3-5 sentences.>"
 }`;
 }

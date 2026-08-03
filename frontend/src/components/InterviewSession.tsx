@@ -23,6 +23,7 @@ interface Evaluation {
   communication_clarity: number;
   overall_score: number;
   feedback: Record<string, { text: string; suggestions: string[] }>;
+  modelAnswer?: string;
 }
 
 type SessionPhase = 'pre-confidence' | 'interview' | 'post-confidence' | 'complete';
@@ -313,13 +314,15 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
       if (!res.ok) throw new Error('Failed to evaluate response');
       const evalData = await res.json();
       // Ensure numeric fields are numbers (Postgres NUMERIC returns strings)
+      const feedbackData = typeof evalData.feedback === 'string' ? JSON.parse(evalData.feedback) : evalData.feedback;
       const parsed: Evaluation = {
         content_relevance: parseFloat(evalData.content_relevance),
         structure_organization: parseFloat(evalData.structure_organization),
         technical_accuracy: parseFloat(evalData.technical_accuracy),
         communication_clarity: parseFloat(evalData.communication_clarity),
         overall_score: parseFloat(evalData.overall_score),
-        feedback: typeof evalData.feedback === 'string' ? JSON.parse(evalData.feedback) : evalData.feedback,
+        feedback: feedbackData,
+        modelAnswer: feedbackData?.modelAnswer || undefined,
       };
       setEvaluation(parsed);
       setAllEvaluations((prev) => [...prev, parsed]);
@@ -356,13 +359,15 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
       if (!res.ok) throw new Error('Failed to evaluate revised response');
       const evalData = await res.json();
       // Ensure numeric fields are numbers (Postgres NUMERIC returns strings)
+      const feedbackData = typeof evalData.feedback === 'string' ? JSON.parse(evalData.feedback) : evalData.feedback;
       const parsed: Evaluation = {
         content_relevance: parseFloat(evalData.content_relevance),
         structure_organization: parseFloat(evalData.structure_organization),
         technical_accuracy: parseFloat(evalData.technical_accuracy),
         communication_clarity: parseFloat(evalData.communication_clarity),
         overall_score: parseFloat(evalData.overall_score),
-        feedback: typeof evalData.feedback === 'string' ? JSON.parse(evalData.feedback) : evalData.feedback,
+        feedback: feedbackData,
+        modelAnswer: feedbackData?.modelAnswer || undefined,
       };
       setRevisedEvaluation(parsed);
       setAllRevisedEvaluations((prev) => [...prev, parsed]);
@@ -722,6 +727,15 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
               })}
             </div>
           </div>
+
+          {/* Model Answer */}
+          {evaluation.modelAnswer && (
+            <div className="glass-card p-6 border-emerald-500/20">
+              <h3 className="text-white font-medium mb-2">✅ Model Answer</h3>
+              <p className="text-slate-300 text-sm leading-relaxed">{evaluation.modelAnswer}</p>
+              <p className="text-slate-500 text-xs mt-2">This is what a strong response would look like. Use it as a reference when revising.</p>
+            </div>
+          )}
 
           {/* Revision prompt */}
           <div className="glass-card p-6 border-indigo-500/20">
