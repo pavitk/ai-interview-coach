@@ -1,20 +1,51 @@
 /**
  * AI client wrapper.
- * Priority: Groq API (when GROQ_API_KEY is set) → Mock fallback
+ * Uses Groq API with automatic key rotation on rate limits.
  */
 
 /**
+ * Get all available Groq API keys from environment.
+ */
+function getGroqKeys(): string[] {
+  const keys: string[] = [];
+  const key1 = process.env.GROQ_API_KEY;
+  const key2 = process.env.GROQ_API_KEY_2;
+  const key3 = process.env.GROQ_API_KEY_3;
+  if (key1 && key1 !== 'YOUR_GROQ_API_KEY_HERE') keys.push(key1);
+  if (key2) keys.push(key2);
+  if (key3) keys.push(key3);
+  return keys;
+}
+
+/**
  * Invokes the AI (Groq or mock) with the given prompt.
+ * Automatically rotates API keys on rate limit (429) errors.
  */
 export async function invokeAI(prompt: string, temperature: number): Promise<string> {
-  // Use Groq if API key is available
-  const groqKey = process.env.GROQ_API_KEY;
-  if (groqKey && groqKey !== 'YOUR_GROQ_API_KEY_HERE') {
-    return invokeGroq(prompt, temperature, groqKey);
+  const keys = getGroqKeys();
+
+  if (keys.length === 0) {
+    return invokeMock(prompt);
   }
 
-  // Fall back to mock
-  return invokeMock(prompt);
+  let lastError: Error | null = null;
+  for (const key of keys) {
+    try {
+      return await invokeGroq(prompt, temperature, key);
+    } catch (err: any) {
+      lastError = err;
+      // If it's a rate limit error, try the next key
+      if (err.message && err.message.includes('429')) {
+        console.warn(`Groq key rate limited, trying next key...`);
+        continue;
+      }
+      // For other errors, don't retry with different keys
+      throw err;
+    }
+  }
+
+  // All keys exhausted
+  throw lastError || new Error('All Groq API keys rate limited. Please try again later.');
 }
 
 /**
