@@ -95,6 +95,16 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
     }
   }, [sessionId]);
 
+  // Preload voices on mount — forces browser to initialize speech synthesis
+  useEffect(() => {
+    window.speechSynthesis.getVoices();
+    // Some browsers need a silent utterance to fully initialize
+    const primer = new SpeechSynthesisUtterance('');
+    primer.volume = 0;
+    window.speechSynthesis.speak(primer);
+    window.speechSynthesis.cancel();
+  }, []);
+
   // Cleanup speech on unmount
   useEffect(() => {
     return () => {
@@ -133,71 +143,57 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
   };
 
   const speakQuestion = useCallback((text: string) => {
-    // Cancel any ongoing speech first
+    // Stop any ongoing speech
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
 
-    const speak = () => {
-      // Chrome bug: need a slight delay after cancel() before speak() works
-      setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utteranceRef.current = utterance;
+    // Chrome/Safari bug: after cancel(), the first speak() is often silently dropped.
+    // Workaround: speak a blank utterance first to "prime" the queue, then speak the real one.
+    const primer = new SpeechSynthesisUtterance('');
+    primer.volume = 0;
+    window.speechSynthesis.speak(primer);
 
-        const voices = window.speechSynthesis.getVoices();
-        // Prefer high-quality voices
-        const preferredVoice = voices.find(v =>
-          v.lang.startsWith('en') && !v.localService && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Daniel'))
-        ) || voices.find(v => v.lang.startsWith('en') && !v.localService)
-          || voices.find(v => v.lang.startsWith('en'));
+    // Small delay to let the primer clear the queue state
+    setTimeout(() => {
+      window.speechSynthesis.cancel(); // clear the primer
 
-        if (preferredVoice) utterance.voice = preferredVoice;
-        utterance.rate = 0.92;
-        utterance.pitch = 1;
-        utterance.volume = 1;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utteranceRef.current = utterance;
 
-        utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = (e) => {
-          console.warn('Speech synthesis error:', e.error);
-          setIsSpeaking(false);
-        };
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v =>
+        v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Daniel'))
+      ) || voices.find(v => v.lang.startsWith('en'));
 
-        window.speechSynthesis.speak(utterance);
+      if (preferredVoice) utterance.voice = preferredVoice;
+      utterance.rate = 0.92;
+      utterance.pitch = 1;
+      utterance.volume = 1;
 
-        // Chrome pauses long utterances — keep-alive workaround
-        const keepAlive = setInterval(() => {
-          if (!window.speechSynthesis.speaking) {
-            clearInterval(keepAlive);
-          } else {
-            window.speechSynthesis.pause();
-            window.speechSynthesis.resume();
-          }
-        }, 10000);
-
-        utterance.onend = () => {
-          clearInterval(keepAlive);
-          setIsSpeaking(false);
-        };
-      }, 100);
-    };
-
-    // Ensure voices are loaded before speaking
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      speak();
-    } else {
-      // Voices not loaded yet — wait for them
-      const handleVoicesChanged = () => {
-        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
-        speak();
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = (e) => {
+        console.warn('Speech error:', e.error);
+        setIsSpeaking(false);
       };
-      window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
-      // Fallback if event never fires
-      setTimeout(() => {
-        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
-        speak();
-      }, 1000);
-    }
+
+      window.speechSynthesis.speak(utterance);
+
+      // Chrome pauses long utterances — keep-alive workaround
+      const keepAlive = setInterval(() => {
+        if (!window.speechSynthesis.speaking) {
+          clearInterval(keepAlive);
+        } else {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }
+      }, 10000);
+
+      utterance.onend = () => {
+        clearInterval(keepAlive);
+        setIsSpeaking(false);
+      };
+    }, 50);
   }, []);
 
   const toggleShowText = () => {
@@ -265,6 +261,11 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
     setShowText(false);
     setUseTextInput(!speechRecognitionAvailable);
     setPartialTranscript('');
+    // Stop any ongoing speech but prime the queue so next speak() works on first click
+    window.speechSynthesis.cancel();
+    const primer = new SpeechSynthesisUtterance('');
+    primer.volume = 0;
+    window.speechSynthesis.speak(primer);
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
     resetAnalytics();
