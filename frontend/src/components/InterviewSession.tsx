@@ -133,27 +133,70 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
   };
 
   const speakQuestion = useCallback((text: string) => {
+    // Cancel any ongoing speech first
     window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+
     const speak = () => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utteranceRef.current = utterance;
-      const voices = window.speechSynthesis.getVoices();
-      const naturalVoice = voices.find(v =>
-        v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel'))
-      ) || voices.find(v => v.lang.startsWith('en'));
-      if (naturalVoice) utterance.voice = naturalVoice;
-      utterance.rate = 0.95;
-      utterance.pitch = 1;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
+      // Chrome bug: need a slight delay after cancel() before speak() works
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance;
+
+        const voices = window.speechSynthesis.getVoices();
+        // Prefer high-quality voices
+        const preferredVoice = voices.find(v =>
+          v.lang.startsWith('en') && !v.localService && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Daniel'))
+        ) || voices.find(v => v.lang.startsWith('en') && !v.localService)
+          || voices.find(v => v.lang.startsWith('en'));
+
+        if (preferredVoice) utterance.voice = preferredVoice;
+        utterance.rate = 0.92;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = (e) => {
+          console.warn('Speech synthesis error:', e.error);
+          setIsSpeaking(false);
+        };
+
+        window.speechSynthesis.speak(utterance);
+
+        // Chrome pauses long utterances — keep-alive workaround
+        const keepAlive = setInterval(() => {
+          if (!window.speechSynthesis.speaking) {
+            clearInterval(keepAlive);
+          } else {
+            window.speechSynthesis.pause();
+            window.speechSynthesis.resume();
+          }
+        }, 10000);
+
+        utterance.onend = () => {
+          clearInterval(keepAlive);
+          setIsSpeaking(false);
+        };
+      }, 100);
     };
+
+    // Ensure voices are loaded before speaking
     const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) { speak(); }
-    else {
-      window.speechSynthesis.onvoiceschanged = () => { speak(); window.speechSynthesis.onvoiceschanged = null; };
-      setTimeout(() => { if (!utteranceRef.current || !window.speechSynthesis.speaking) speak(); }, 500);
+    if (voices.length > 0) {
+      speak();
+    } else {
+      // Voices not loaded yet — wait for them
+      const handleVoicesChanged = () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+        speak();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+      // Fallback if event never fires
+      setTimeout(() => {
+        window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+        speak();
+      }, 1000);
     }
   }, []);
 
@@ -268,11 +311,19 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
       });
       if (!res.ok) throw new Error('Failed to evaluate response');
       const evalData = await res.json();
-      setEvaluation(evalData);
-      setAllEvaluations((prev) => [...prev, evalData]);
+      // Ensure numeric fields are numbers (Postgres NUMERIC returns strings)
+      const parsed: Evaluation = {
+        content_relevance: parseFloat(evalData.content_relevance),
+        structure_organization: parseFloat(evalData.structure_organization),
+        technical_accuracy: parseFloat(evalData.technical_accuracy),
+        communication_clarity: parseFloat(evalData.communication_clarity),
+        overall_score: parseFloat(evalData.overall_score),
+        feedback: typeof evalData.feedback === 'string' ? JSON.parse(evalData.feedback) : evalData.feedback,
+      };
+      setEvaluation(parsed);
+      setAllEvaluations((prev) => [...prev, parsed]);
       // We need the response_id from the backend for revision
-      // The evaluate endpoint creates the response, so we fetch it
-      setResponseId(evalData.response_id); // response_id returned by evaluate endpoint
+      setResponseId(evalData.response_id);
       setQuestionPhase('showing-feedback');
     } catch (err: any) {
       setError(err.message);
@@ -303,8 +354,17 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
       });
       if (!res.ok) throw new Error('Failed to evaluate revised response');
       const evalData = await res.json();
-      setRevisedEvaluation(evalData);
-      setAllRevisedEvaluations((prev) => [...prev, evalData]);
+      // Ensure numeric fields are numbers (Postgres NUMERIC returns strings)
+      const parsed: Evaluation = {
+        content_relevance: parseFloat(evalData.content_relevance),
+        structure_organization: parseFloat(evalData.structure_organization),
+        technical_accuracy: parseFloat(evalData.technical_accuracy),
+        communication_clarity: parseFloat(evalData.communication_clarity),
+        overall_score: parseFloat(evalData.overall_score),
+        feedback: typeof evalData.feedback === 'string' ? JSON.parse(evalData.feedback) : evalData.feedback,
+      };
+      setRevisedEvaluation(parsed);
+      setAllRevisedEvaluations((prev) => [...prev, parsed]);
       setQuestionPhase('showing-revision-feedback');
     } catch (err: any) {
       setError(err.message);
@@ -532,7 +592,7 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
           )}
           {question && (
             <div className="glass-card p-6 mb-6">
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/20 flex items-center justify-center shrink-0">
                   <span className="text-indigo-300 text-sm font-medium">Q{currentIndex}</span>
                 </div>
@@ -543,8 +603,9 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
                   {showText ? '👁️ Hide Text' : '👁️ Show Text'}
                 </button>
               </div>
+              {/* Question text hidden behind toggle */}
               {showText && (
-                <div className="mt-3 p-4 bg-white/3 rounded-lg border border-white/5">
+                <div className="p-4 bg-white/3 rounded-lg border border-white/5">
                   <p className="text-white text-lg leading-relaxed">{question.question_text}</p>
                 </div>
               )}
@@ -668,10 +729,15 @@ export default function InterviewSession({ user }: InterviewSessionProps) {
               Based on the feedback above, revise your response to improve your score. 
               Focus on the areas where you scored lowest.
             </p>
-            <button onClick={startRevision} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center gap-2">
-              Revise My Answer
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-            </button>
+            <div className="flex items-center gap-3">
+              <button onClick={startRevision} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all flex items-center gap-2">
+                Revise My Answer
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              </button>
+              <button onClick={nextQuestion} className="px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-medium rounded-xl transition-all text-sm">
+                Skip → {currentIndex >= 5 ? 'Finish' : 'Next Question'}
+              </button>
+            </div>
           </div>
         </div>
       )}
