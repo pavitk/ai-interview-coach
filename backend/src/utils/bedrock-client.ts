@@ -87,7 +87,7 @@ Return ONLY valid JSON, no markdown, no code blocks, no explanation.` },
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       messages,
       temperature: isEvaluation ? 0.4 : temperature,
       max_tokens: 4096,
