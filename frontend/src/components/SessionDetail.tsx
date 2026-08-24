@@ -288,15 +288,20 @@ export default function SessionDetail() {
               </div>
             ))}
           </div>
-          {session.confidence.length === 2 && (
-            <div className="mt-3 text-center">
-              <span className="text-slate-400 text-sm">Confidence Change: </span>
-              <span className={`font-semibold ${(session.confidence[1].average_score - session.confidence[0].average_score) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                {(session.confidence[1].average_score - session.confidence[0].average_score) >= 0 ? '+' : ''}
-                {(session.confidence[1].average_score - session.confidence[0].average_score).toFixed(1)}
-              </span>
-            </div>
-          )}
+          {session.confidence.length === 2 && (() => {
+            const pre = session.confidence.find(c => c.type === 'pre');
+            const post = session.confidence.find(c => c.type === 'post');
+            if (!pre || !post) return null;
+            const change = post.average_score - pre.average_score;
+            return (
+              <div className="mt-3 text-center">
+                <span className="text-slate-400 text-sm">Confidence Change: </span>
+                <span className={`font-semibold ${change >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {change >= 0 ? '+' : ''}{change.toFixed(1)}
+                </span>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>
